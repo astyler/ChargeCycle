@@ -1,0 +1,29 @@
+System Architecture Description:
+
+This project uses a Model View Control paradigm to control the ChargeCycle and Display.
+
+The Model in the paradigm is captured in VehicleState.java class.  This class contains 
+members that describe the state of the vehicle.  Things like GPS position, charge states,
+speed, acceleration, etc. are stored.  
+
+The View will be the GUI display for the screen on the cycle.  It reads user input and 
+displays state and data.
+
+The Controller grabs data from the model, makes control decisions, pushes data to the view,
+and handles user commands.
+
+There are some simultaneous threads running in this system:
+The Communications thread deals with all communication between the computer and microcontroller (MC).  
+It reads the serial data and updates the VehicleState, locking the non-atomic members when updating (or,
+if we are worried about half-updated states, locking the entire VehicleState is an option).  Also,
+it sends any queued commands to the MC between data stream reads.
+
+The View thread runs and updates the GUI.  It will read any User input and adjust the view as 
+requested.  Any user input that affects control will be placed into a CommandQueue that is 
+monitored by the Controller thread.
+
+The Controller thread is the brains of the operation.  It reads the vehicle state and makes 
+control decisions.  These decisions are passed to the communications' thread command queue to
+be send to the MC.  It also reads the CommandQueue from user input and adjusts control, updates
+vehicle state, or forwards MC commands to the communications.
+   
