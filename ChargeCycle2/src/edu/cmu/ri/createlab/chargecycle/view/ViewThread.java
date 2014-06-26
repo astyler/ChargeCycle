@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.cmu.create.chargecycle.view;
+package edu.cmu.ri.createlab.chargecycle.view;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -14,8 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
-import edu.cmu.create.chargecycle.model.State;
-import edu.cmu.create.chargecycle.model.VehicleState;
+import edu.cmu.ri.createlab.chargecycle.model.State;
+import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 
 /**
  * @author astyler

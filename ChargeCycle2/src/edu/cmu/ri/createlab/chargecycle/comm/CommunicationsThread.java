@@ -1,7 +1,7 @@
 package edu.cmu.ri.createlab.chargecycle.comm;
 
-import edu.cmu.create.chargecycle.model.State;
-import edu.cmu.create.chargecycle.model.VehicleState;
+import edu.cmu.ri.createlab.chargecycle.model.State;
+import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 
 public class CommunicationsThread implements Runnable {
 

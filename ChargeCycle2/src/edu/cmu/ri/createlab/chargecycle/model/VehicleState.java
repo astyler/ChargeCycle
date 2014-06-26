@@ -1,4 +1,4 @@
-package edu.cmu.create.chargecycle.model;
+package edu.cmu.ri.createlab.chargecycle.model;
 
 /**
  * @author astyler
