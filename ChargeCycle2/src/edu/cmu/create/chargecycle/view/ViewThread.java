@@ -4,12 +4,18 @@
 package edu.cmu.create.chargecycle.view;
 
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.SwingWorker;
+import javax.swing.Timer;
 
 import edu.cmu.create.chargecycle.model.State;
+import edu.cmu.create.chargecycle.model.VehicleState;
 
 /**
  * @author astyler
@@ -21,7 +27,7 @@ public class ViewThread implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	private final State state;
-	private final JLabel latLab = new JLabel("-1");
+	private final JLabel latLab = new JLabel("Lat: -1");
 	
 	public ViewThread(State state){
 		this.state = state;
@@ -32,12 +38,22 @@ public class ViewThread implements Runnable {
         // Create the window
        constructGui();
        
-       while(true){
-    	   latLab.setText("Temp: "+state.getAmbientTemp());
-       }
+       Timer updateDisplayTimer = new Timer(1000, new ActionListener(){
+         @Override
+         public void actionPerformed(ActionEvent e) {
+        	updateDisplay(); 
+         }
+       });
+       
+       updateDisplayTimer.start();
 
 	}
 	
+	protected void updateDisplay() {
+		latLab.setText("Lat: "+ state.getVehicleState().getGPSLat());
+		
+	}
+
 	private void constructGui(){
 		 JFrame f = new JFrame("Hello, World!");
 	     // Sets the behavior for when the window is closed
@@ -45,7 +61,7 @@ public class ViewThread implements Runnable {
 	     // Add a layout manager so that the button is not placed on top of the label
 	     f.setLayout(new FlowLayout());
 	     // Add a label and a button
-	     f.add(new JLabel("Hello, world!"));
+	     f.add(latLab);
 	     f.add(new JButton("Press me!"));
 	        // Arrange the components inside the window
 	        f.pack();
@@ -53,4 +69,6 @@ public class ViewThread implements Runnable {
 	        f.setVisible(true);
 	}
 
+
+	
 }
