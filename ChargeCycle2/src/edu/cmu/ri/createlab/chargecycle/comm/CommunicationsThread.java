@@ -15,7 +15,7 @@ public class CommunicationsThread implements Runnable {
 	public void run() {
 		int i = 0;
 		while(true){			
-			state.setVehicleState(new VehicleState(i,0,0,0,0,0,0,0,0, 0, 0));
+			state.setVehicleState(new VehicleState("V1", "V1", "V1", false, false, false, false, true, false, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, i, 'N', 0.0, 'E', false, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0));
 			i++;
 			try {
 				Thread.sleep(100);

@@ -16,7 +16,7 @@ public class State {
 	private volatile double ambientTemp;
 	
 	public State(){
-		this.vehicle = new VehicleState(0,0,0,0,0,0,0,0,0,0,0);
+		this.vehicle = null;//new VehicleState(0,0,0,0,0,0,0,0,0,0,0);
 		this.ambientTemp = 0;
 	}
 	
@@ -34,7 +34,7 @@ public class State {
 	
 	public void setVehicleState(VehicleState newState){
 		//updating references is atomic and need not be synchronized
-		this.vehicle = new VehicleState(newState);
+		this.vehicle = newState;
 		
 	}
 }

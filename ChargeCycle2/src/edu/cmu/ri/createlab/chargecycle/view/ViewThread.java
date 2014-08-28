@@ -38,7 +38,7 @@ public class ViewThread implements Runnable {
         // Create the window
        constructGui();
        
-       Timer updateDisplayTimer = new Timer(1000, new ActionListener(){
+       Timer updateDisplayTimer = new Timer(100, new ActionListener(){
          @Override
          public void actionPerformed(ActionEvent e) {
         	updateDisplay(); 
@@ -50,7 +50,8 @@ public class ViewThread implements Runnable {
 	}
 	
 	protected void updateDisplay() {
-		latLab.setText("Lat: "+ state.getVehicleState().getGPSLat());
+		if(state.getVehicleState() != null)
+			latLab.setText("Lat: "+ state.getVehicleState().getGPSLatitude());
 		
 	}
 
