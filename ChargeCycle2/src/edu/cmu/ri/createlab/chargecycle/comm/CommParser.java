@@ -6,7 +6,7 @@ public class CommParser {
 	public static VehicleState Parse(String comm) throws ParseException{
 		//Electric Bike MCU Data Protocol V1
 		String[] parts = comm.split(",");
-		if(parts.length != 49)
+		if(parts.length != 51)
 			throw new ParseException("Badly formatted input string: " + comm);
 		if(!parts[0].equals("!!!"))
 			throw new ParseException("Missing starting sync sequence '!!!' in input string: "+comm);
@@ -42,26 +42,26 @@ public class CommParser {
 				Integer.parseInt(parts[27]),	//int brakePot
 				Integer.parseInt(parts[28]),	//int brakeScale
 				Integer.parseInt(parts[29]),	//int brakeMax
-				Integer.parseInt(parts[29]),	//int brakeOutputToMotor, 
-				Double.parseDouble(parts[30]),	//double gPSLatitude,
-				parts[31].charAt(0),			//char gPSLatHemisphere, 
-				Double.parseDouble(parts[32]),	//double gPSLongitude
-				parts[33].charAt(0),			//char gPSLonHemisphere,
-				Integer.parseInt(parts[34]) == 1,//boolean gPSWarning, 
-				Double.parseDouble(parts[35]),	//double motorCurrent,
-				Double.parseDouble(parts[36]),	//double batteryCurrent,
-				Double.parseDouble(parts[37]),	//double capacitorCurrent, 
-				Double.parseDouble(parts[38]),	//double battery1Voltage,
-				Double.parseDouble(parts[39]),	//double battery0Voltage, 
-				Double.parseDouble(parts[40]),	//double capacitor1Voltage,
-				Double.parseDouble(parts[41]),	//double capacitor0Voltage, 
-				Double.parseDouble(parts[42]),	//double battery1Temperature,
-				Double.parseDouble(parts[43]),	//double battery0Temperature, 
-				Double.parseDouble(parts[44]),	//double capacitor1Temperature,
-				Double.parseDouble(parts[45]),	//double capacitor0Temperature, 
-				Integer.parseInt(parts[46]),	//int bikeSpeedEncoderTicksAbsolute,
-				Double.parseDouble(parts[47]),	//double bikeSpeedFPS, 
-				Double.parseDouble(parts[48])	//double bikeSpeedMPH
+				Integer.parseInt(parts[30]),	//int brakeOutputToMotor, 
+				Double.parseDouble(parts[31]),	//double gPSLatitude,
+				parts[32].charAt(0),			//char gPSLatHemisphere, 
+				Double.parseDouble(parts[33]),	//double gPSLongitude
+				parts[34].charAt(0),			//char gPSLonHemisphere,
+				Integer.parseInt(parts[35]) == 1,//boolean gPSWarning, 
+				Double.parseDouble(parts[36]),	//double motorCurrent,
+				Double.parseDouble(parts[37]),	//double batteryCurrent,
+				Double.parseDouble(parts[38]),	//double capacitorCurrent, 
+				Double.parseDouble(parts[39]),	//double battery1Voltage,
+				Double.parseDouble(parts[40]),	//double battery0Voltage, 
+				Double.parseDouble(parts[41]),	//double capacitor1Voltage,
+				Double.parseDouble(parts[42]),	//double capacitor0Voltage, 
+				Double.parseDouble(parts[43]),	//double battery1Temperature,
+				Double.parseDouble(parts[44]),	//double battery0Temperature, 
+				Double.parseDouble(parts[45]),	//double capacitor1Temperature,
+				Double.parseDouble(parts[46]),	//double capacitor0Temperature, 
+				Integer.parseInt(parts[47]),	//int bikeSpeedEncoderTicksAbsolute,
+				Double.parseDouble(parts[48]),	//double bikeSpeedFPS, 
+				Double.parseDouble(parts[49])	//double bikeSpeedMPH
 				);
 	}
 }
