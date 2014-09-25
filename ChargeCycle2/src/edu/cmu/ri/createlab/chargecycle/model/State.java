@@ -17,9 +17,12 @@ public class State {
 	//as it is 2 operations
 	private volatile double ambientTemp;
 	
+	private volatile boolean isAlive;
+	
 	public State(){
 		this.vehicle = null;//new VehicleState(0,0,0,0,0,0,0,0,0,0,0);
 		this.ambientTemp = 0;
+		this.isAlive = true;
 	}
 	
 	public VehicleState getVehicleState(){
@@ -38,5 +41,13 @@ public class State {
 		//updating references is atomic and need not be synchronized
 		this.vehicle = newState;
 		
+	}
+
+	public boolean isAlive() {
+		return isAlive;
+	}
+
+	public void setAlive(boolean alive) {
+		this.isAlive = alive;
 	}
 }

@@ -38,7 +38,19 @@ public class Logger {
 		FileWriter fw = new FileWriter(log, true);
 		for(String s : logBuffer){
 			fw.write(s);
+			fw.write(System.lineSeparator());
 		}
 		fw.close();		
+	}
+	
+	public synchronized String getRecentLogText(int lines){
+		int endIndex = logBuffer.size(); // exclusive
+		int fromIndex = endIndex - lines;
+		fromIndex = fromIndex < 0 ? 0 : fromIndex;
+		StringBuilder sb = new StringBuilder();
+		for(String s: logBuffer.subList(fromIndex, endIndex)){
+			sb.append(s).append("\n");
+		}
+		return sb.toString();
 	}
 }

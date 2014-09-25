@@ -8,6 +8,7 @@ import javax.swing.SwingWorker;
 
 import edi.cmu.ri.createlab.chargecycle.logging.Logger;
 import edu.cmu.ri.createlab.chargecycle.comm.CommunicationsThread;
+import edu.cmu.ri.createlab.chargecycle.comm.Communicator;
 import edu.cmu.ri.createlab.chargecycle.model.State;
 import edu.cmu.ri.createlab.chargecycle.view.ViewThread;
 
@@ -17,28 +18,34 @@ public class ChargeCycle{
 		
 		State state = new State();
 		Logger logger = new Logger(logFile, true);
+		Communicator comms = new Communicator(logger, state);
 		
-		SwingUtilities.invokeLater(new ViewThread(state));
-		Thread commThread = new Thread(new CommunicationsThread(state,logger));
-		commThread.start();
-		//(new Thread(new CommunicationsThread(state, logger))).start();
-		//remake
-		//Communicator should take the State and logger and be the listener
-		//the background thread should just be to establish comms unless that 
-		//can go on the main thread (if NOTHING else can be done without comms)
-		while(state.getVehicleState().isKey()){
+		SwingUtilities.invokeLater(new ViewThread(state, logger));
+		
+		SwingWorker<Boolean, String> commThread = new CommunicationsThread(comms, logger);
+		commThread.execute();
+		
+		//state will be alive until window is closed, comms fail to establish,
+		//or comms establish and then the key is turned off
+		while(state.isAlive()){	
 			try {
-				Thread.sleep(1000);
+				//do main thread stuff
+				
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				System.err.println("Main thread interrupted");
 				e.printStackTrace();
 			}
 			
-		}
-		
-		commThread.interrupt();
+		}	
+		logger.logEvent("Killing communications...");		
+		commThread.cancel(true);
+		if(comms.getConnected())
+			comms.disconnect();		
 		try {
+			logger.logEvent("Writing log.");
 			logger.flushLog();
+			System.out.println("Log successfully written");
 		} catch (IOException e) {
 			System.err.println("Error writing event log file");
 			e.printStackTrace();

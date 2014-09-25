@@ -5,22 +5,17 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import edi.cmu.ri.createlab.chargecycle.logging.Logger;
-import edu.cmu.ri.createlab.chargecycle.model.State;
-import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
 
-public class CommunicationsThread extends SwingWorker<Void, String> implements SerialPortEventListener {
 
-	private final State state;
-	private final Logger logger;
+public class CommunicationsThread extends SwingWorker<Boolean, String>  {
+
 	private final Communicator comms;
+	private final Logger logger;
 	
-	public CommunicationsThread(State state, Logger logger){
-		this.state = state;
+	public CommunicationsThread(Communicator comms, Logger logger){
+		this.comms = comms;
 		this.logger = logger;
-		this.comms = new Communicator(logger);
 	}
 			
 	public String getExampleSerialMessage(){
@@ -29,28 +24,23 @@ public class CommunicationsThread extends SwingWorker<Void, String> implements S
 	}
 
 	@Override
-	protected Void doInBackground() throws Exception {
-		// TODO Auto-generated method stub
+	protected Boolean doInBackground() throws Exception {
+		// Connect to Serial Port
+		logger.logEvent("Searching for serial ports...");
 		List<CommPortIdentifier> ports = comms.searchForPorts();
 		for(CommPortIdentifier port : ports){
+			logger.logEvent("Attempting to connect to port: "+port.getName());
 			if(comms.connect(port)){
-				
-				
+				logger.logEvent("Port Connected");				
 			}
 			else{
+				logger.logEvent("Port Connect Attempt Failed");
 				continue;
-			}
-			
-			
-			
+			}		
 		}
-		return null;
+		if(ports.isEmpty())
+			logger.logEvent("No Ports Found!  No communication established with bike");
+		//failed to connect
+		return false;
 	}
-
-	@Override
-	public void serialEvent(SerialPortEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

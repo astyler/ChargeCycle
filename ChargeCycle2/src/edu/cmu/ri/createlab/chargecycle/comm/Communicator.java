@@ -5,7 +5,9 @@ Adapted from code from http://henrypoon.wordpress.com/
  */
 
 import edi.cmu.ri.createlab.chargecycle.logging.Logger;
+import edu.cmu.ri.createlab.chargecycle.model.State;
 import gnu.io.*;
+
 import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,9 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TooManyListenersException;
 
-public class Communicator// implements SerialPortEventListener
+public class Communicator implements SerialPortEventListener
 {
 	private final Logger logger;
+	private final State state;
 	
     //for containing the ports that will be found
     private Enumeration ports = null;
@@ -29,6 +32,7 @@ public class Communicator// implements SerialPortEventListener
     //this is the object that contains the opened port
     private CommPortIdentifier selectedPortIdentifier = null;
     private SerialPort serialPort = null;
+    private String portName = null;
 
     //input and output streams for sending and receiving data
     private InputStream input = null;
@@ -51,8 +55,9 @@ public class Communicator// implements SerialPortEventListener
     //this string is written to the GUI
     String logText = "";
 
-    public Communicator(Logger logger){
+    public Communicator(Logger logger, State state){
     	this.logger = logger;
+    	this.state = state;
     }
 
     //search for all the serial ports
@@ -88,7 +93,7 @@ public class Communicator// implements SerialPortEventListener
     {
     	this.selectedPortIdentifier = port;
         CommPort commPort = null;
-        String portName = this.selectedPortIdentifier.getName();
+        this.portName = this.selectedPortIdentifier.getName();
         
         try
         {
@@ -192,7 +197,7 @@ public class Communicator// implements SerialPortEventListener
         }
         catch (Exception e)
         {
-            logText = "Failed to close " + serialPort.getName() + "(" + e.toString() + ")";
+            logText = "Failed to close " + portName + "(" + e.toString() + ")";
             logger.logEvent(logText);
             logger.logException(e);
         }
@@ -257,4 +262,13 @@ public class Communicator// implements SerialPortEventListener
             logger.logException(e);
         }
     }
+
+	@Override
+	public void serialEvent(SerialPortEvent arg0) {
+		
+		// data came in.  update rolling buffer
+		// parse rolling buffer for complete sentences
+		//if complete sentence, update state and remove from buffer;
+		
+	}
 }
