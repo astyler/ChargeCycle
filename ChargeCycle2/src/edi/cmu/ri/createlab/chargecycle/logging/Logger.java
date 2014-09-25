@@ -20,7 +20,7 @@ public class Logger {
 		this.log = logFile;
 	}
 	
-	public void logException(Exception x){
+	public synchronized void logException(Exception x){
 		logBuffer.add("ERR: " + df.format(Calendar.getInstance().getTime()) + " : " + x.toString());
 		if(!debug) return;
 		for(StackTraceElement e : x.getStackTrace()){
@@ -28,11 +28,11 @@ public class Logger {
 		}
 	}
 	
-	public void logEvent(String msg){
+	public synchronized void logEvent(String msg){
 		logBuffer.add(df.format(Calendar.getInstance().getTime()) + " : " + msg);
 	}
 	
-	public void flushLog() throws IOException{
+	public synchronized void flushLog() throws IOException{
 		log.getParentFile().mkdirs();
 		log.createNewFile();
 		FileWriter fw = new FileWriter(log, true);

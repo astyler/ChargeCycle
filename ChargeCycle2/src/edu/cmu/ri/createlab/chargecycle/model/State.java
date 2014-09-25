@@ -13,6 +13,8 @@ public class State {
 	private volatile VehicleState vehicle; 
 	//volatility of 64 bit  long/double values is used to guarantee that their
 	//writes are atomic and thread safe
+	//note, any reads and then writes based on the read value is not atomic
+	//as it is 2 operations
 	private volatile double ambientTemp;
 	
 	public State(){
