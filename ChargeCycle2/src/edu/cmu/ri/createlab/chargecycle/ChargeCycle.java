@@ -6,7 +6,7 @@ import java.io.IOException;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import edi.cmu.ri.createlab.chargecycle.logging.Logger;
+import edi.cmu.ri.createlab.chargecycle.logging.EventLogger;
 import edu.cmu.ri.createlab.chargecycle.comm.CommunicationsThread;
 import edu.cmu.ri.createlab.chargecycle.comm.Communicator;
 import edu.cmu.ri.createlab.chargecycle.model.State;
@@ -17,7 +17,7 @@ public class ChargeCycle{
 		File logFile = new File(args[0]);		
 		
 		State state = new State();
-		Logger logger = new Logger(logFile, true);
+		EventLogger logger = new EventLogger(logFile, true);
 		Communicator comms = new Communicator(logger, state);
 		
 		SwingUtilities.invokeLater(new ViewThread(state, logger));

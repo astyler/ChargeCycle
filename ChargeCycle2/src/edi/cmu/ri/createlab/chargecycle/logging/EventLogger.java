@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class Logger {
+public class EventLogger {
 	private final List<String> logBuffer;
 	private final boolean debug;
 	private final DateFormat df = DateFormat.getDateTimeInstance();
 	private final File log;
 	
-	public Logger(File logFile, boolean debug){
+	public EventLogger(File logFile, boolean debug){
 		this.logBuffer = new ArrayList<String>();
 		this.debug = debug;
 		this.log = logFile;

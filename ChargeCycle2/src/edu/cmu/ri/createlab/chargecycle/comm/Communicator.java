@@ -4,7 +4,7 @@ package edu.cmu.ri.createlab.chargecycle.comm;
 Adapted from code from http://henrypoon.wordpress.com/
  */
 
-import edi.cmu.ri.createlab.chargecycle.logging.Logger;
+import edi.cmu.ri.createlab.chargecycle.logging.EventLogger;
 import edu.cmu.ri.createlab.chargecycle.model.State;
 import gnu.io.*;
 
@@ -20,7 +20,7 @@ import java.util.TooManyListenersException;
 
 public class Communicator implements SerialPortEventListener
 {
-	private final Logger logger;
+	private final EventLogger logger;
 	private final State state;
 	
     //for containing the ports that will be found
@@ -55,7 +55,7 @@ public class Communicator implements SerialPortEventListener
     //this string is written to the GUI
     String logText = "";
 
-    public Communicator(Logger logger, State state){
+    public Communicator(EventLogger logger, State state){
     	this.logger = logger;
     	this.state = state;
     }

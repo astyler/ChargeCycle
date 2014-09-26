@@ -4,16 +4,16 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
-import edi.cmu.ri.createlab.chargecycle.logging.Logger;
+import edi.cmu.ri.createlab.chargecycle.logging.EventLogger;
 import gnu.io.CommPortIdentifier;
 
 
 public class CommunicationsThread extends SwingWorker<Boolean, String>  {
 
 	private final Communicator comms;
-	private final Logger logger;
+	private final EventLogger logger;
 	
-	public CommunicationsThread(Communicator comms, Logger logger){
+	public CommunicationsThread(Communicator comms, EventLogger logger){
 		this.comms = comms;
 		this.logger = logger;
 	}

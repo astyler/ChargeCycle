@@ -18,7 +18,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
-import edi.cmu.ri.createlab.chargecycle.logging.Logger;
+import edi.cmu.ri.createlab.chargecycle.logging.EventLogger;
 import edu.cmu.ri.createlab.chargecycle.model.State;
 import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 
@@ -32,7 +32,7 @@ public class ViewThread implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	private final State state;
-	private final Logger logger;
+	private final EventLogger logger;
 	
 	private final JLabel prechargeLabel = new JLabel("Precharging");
 	private final JLabel dischargeLabel = new JLabel("Discharging");
@@ -45,7 +45,7 @@ public class ViewThread implements Runnable {
 	private final Color falseColor = Color.RED;
 	private Timer updateDisplayTimer;
 	
-	public ViewThread(State state, Logger logger){
+	public ViewThread(State state, EventLogger logger){
 		this.state = state;
 		this.logger = logger;
 	}
