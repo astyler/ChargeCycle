@@ -21,8 +21,6 @@ public class StateLogger {
 	
 	public synchronized void startLogging() throws IOException{
 		logFileDirectory.mkdirs();
-		//StringBuilder sb = new StringBuilder();
-		Calendar time = Calendar.getInstance();
 		String logName = "CCLog_"+fileDateFormat.format(Calendar.getInstance().getTime())+".txt";
 		File log = new File(logFileDirectory, logName);
 		log.createNewFile();

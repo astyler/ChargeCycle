@@ -269,7 +269,7 @@ public class Communicator implements SerialPortEventListener
 			
 			try {				
 				this.state.setVehicleState(CommParser.Parse(inputSentence));
-				logger.logEvent("S: "+inputSentence);
+				//logger.logEvent("S: "+inputSentence);
 			} catch (ParseException e) {
 				logger.logEvent("Parsing of sentence failed");
 				logger.logException(e);
