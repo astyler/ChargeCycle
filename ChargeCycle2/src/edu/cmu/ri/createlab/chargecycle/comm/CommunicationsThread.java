@@ -1,21 +1,22 @@
 package edu.cmu.ri.createlab.chargecycle.comm;
 
 import java.util.List;
-
 import javax.swing.SwingWorker;
-
 import edi.cmu.ri.createlab.chargecycle.logging.EventLogger;
 import gnu.io.CommPortIdentifier;
+import edu.cmu.ri.createlab.chargecycle.model.State;
 
 
 public class CommunicationsThread extends SwingWorker<Boolean, String>  {
 
 	private final Communicator comms;
 	private final EventLogger logger;
+	private final State state;
 	
-	public CommunicationsThread(Communicator comms, EventLogger logger){
+	public CommunicationsThread(State state, Communicator comms, EventLogger logger){
 		this.comms = comms;
 		this.logger = logger;
+		this.state = state;
 	}
 			
 	public String getExampleSerialMessage(){
@@ -30,16 +31,29 @@ public class CommunicationsThread extends SwingWorker<Boolean, String>  {
 		List<CommPortIdentifier> ports = comms.searchForPorts();
 		for(CommPortIdentifier port : ports){
 			logger.logEvent("Attempting to connect to port: "+port.getName());
+			
 			if(comms.connect(port)){
-				logger.logEvent("Port Connected");				
+				logger.logEvent("Port Connected");
 			}
 			else{
 				logger.logEvent("Port Connect Attempt Failed");
 				continue;
 			}		
+			
+			comms.initIOStream();
+			comms.initListener();
+			
+			Thread.sleep(1000);
+			if(this.state.getVehicleState() != null){
+				logger.logEvent("Bike found");
+				return true;
+			}
+			logger.logEvent("Disconnecting");
+			comms.disconnect();	
 		}
+			
 		if(ports.isEmpty())
-			logger.logEvent("No Ports Found!  No communication established with bike");
+			logger.logEvent("No Ports Found! No communication established with bike");
 		//failed to connect
 		return false;
 	}

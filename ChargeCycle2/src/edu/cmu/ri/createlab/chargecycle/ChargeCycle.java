@@ -7,49 +7,74 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import edi.cmu.ri.createlab.chargecycle.logging.EventLogger;
+import edi.cmu.ri.createlab.chargecycle.logging.StateLogger;
 import edu.cmu.ri.createlab.chargecycle.comm.CommunicationsThread;
 import edu.cmu.ri.createlab.chargecycle.comm.Communicator;
 import edu.cmu.ri.createlab.chargecycle.model.State;
+import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 import edu.cmu.ri.createlab.chargecycle.view.ViewThread;
 
 public class ChargeCycle{	
 	public static void main(String[] args) {
-		File logFile = new File(args[0]);		
+		File logFileDirectory = new File(args[0]);		
+		
 		
 		State state = new State();
-		EventLogger logger = new EventLogger(logFile, true);
-		Communicator comms = new Communicator(logger, state);
+		EventLogger eventLogger = new EventLogger(new File(logFileDirectory, "CCEventLog.txt"), false);
+		Communicator comms = new Communicator(eventLogger, state);
+		StateLogger stateLogger = new StateLogger(logFileDirectory);
 		
-		SwingUtilities.invokeLater(new ViewThread(state, logger));
+		SwingUtilities.invokeLater(new ViewThread(state, eventLogger));
 		
-		SwingWorker<Boolean, String> commThread = new CommunicationsThread(comms, logger);
+		SwingWorker<Boolean, String> commThread = new CommunicationsThread(state, comms, eventLogger);
 		commThread.execute();
 		
 		//state will be alive until window is closed, comms fail to establish,
 		//or comms establish and then the key is turned off
+		VehicleState prevState = state.getVehicleState();
+		try {
+			stateLogger.startLogging();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		while(state.isAlive()){	
 			try {
-				//do main thread stuff
+				VehicleState currState = state.getVehicleState();
 				
-				Thread.sleep(50);
+				if(currState != prevState && currState != null){
+					stateLogger.writeState(currState);
+				}
+				//eventLogger.flushLog();
+				//do main thread stuff
+				Thread.sleep(100);
+				prevState = currState;
 			} catch (InterruptedException e) {
 				System.err.println("Main thread interrupted");
+				e.printStackTrace();
+			} catch (IOException e){
+				eventLogger.logEvent("Problem writing vehicle state");
+				eventLogger.logException(e);
 				e.printStackTrace();
 			}
 			
 		}	
-		logger.logEvent("Killing communications...");		
+		eventLogger.logEvent("Killing communications...");		
 		commThread.cancel(true);
 		if(comms.getConnected())
 			comms.disconnect();		
 		try {
-			logger.logEvent("Writing log.");
-			logger.flushLog();
+			eventLogger.logEvent("Writing log.");
+			eventLogger.flushLog();
+			stateLogger.stopLogging();
 			System.out.println("Log successfully written");
 		} catch (IOException e) {
 			System.err.println("Error writing event log file");
 			e.printStackTrace();
 		}
+		
+		System.exit(0);
 	}
 
 }

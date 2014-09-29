@@ -40,7 +40,8 @@ public class EventLogger {
 			fw.write(s);
 			fw.write(System.lineSeparator());
 		}
-		fw.close();		
+		fw.close();
+		logBuffer.clear();
 	}
 	
 	public synchronized String getRecentLogText(int lines){

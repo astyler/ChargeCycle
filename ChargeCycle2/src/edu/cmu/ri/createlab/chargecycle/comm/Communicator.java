@@ -74,7 +74,7 @@ public class Communicator implements SerialPortEventListener
             CommPortIdentifier curPort = (CommPortIdentifier)ports.nextElement();
 
             //get only serial ports
-            if (curPort.getPortType() == CommPortIdentifier.PORT_SERIAL)
+            if (curPort.getPortType() == CommPortIdentifier.PORT_SERIAL && curPort.getName().contains("Bluetooth") == false)
             {
 //                window.cboxPorts.addItem(curPort.getName());
                 //portMap.put(curPort.getName(), curPort);
@@ -118,14 +118,14 @@ public class Communicator implements SerialPortEventListener
         }
         catch (PortInUseException e)
         {
-            logText = portName + " is in use. (" + e.toString() + ")";
+            logText = portName + " is in use.";
             logger.logEvent(logText);
             logger.logException(e);
            
         }
         catch (Exception e)
         {
-            logText = "Failed to open " + portName + "(" + e.toString() + ")";
+            logText = "Failed to open " + portName;
             logger.logEvent(logText);
             logger.logException(e);
         }
@@ -144,13 +144,12 @@ public class Communicator implements SerialPortEventListener
             //
             input = serialPort.getInputStream();
             output = serialPort.getOutputStream();
-            writeData(0, 0);
             
             successful = true;
             return successful;
         }
         catch (IOException e) {
-            logText = "I/O Streams failed to open. (" + e.toString() + ")";
+            logText = "I/O Streams failed to open.";
             logger.logEvent(logText);
             logger.logException(e);
             return successful;
@@ -160,16 +159,16 @@ public class Communicator implements SerialPortEventListener
     //starts the event listener that knows whenever data is available to be read
     //pre: an open serial port
     //post: an event listener for the serial port that knows when data is recieved
-    public void initListener(SerialPortEventListener listener)
+    public void initListener()
     {
         try
         {
-            serialPort.addEventListener(listener);
+            serialPort.addEventListener(this);
             serialPort.notifyOnDataAvailable(true);
         }
         catch (TooManyListenersException e)
         {
-            logText = "Too many listeners. (" + e.toString() + ")";
+            logText = "Too many listeners.";
             logger.logEvent(logText);
             logger.logException(e);
         }
@@ -183,8 +182,6 @@ public class Communicator implements SerialPortEventListener
         //close the serial port
         try
         {
-            writeData(0, 0);
-
             serialPort.removeEventListener();
             serialPort.close();
             input.close();
@@ -197,7 +194,7 @@ public class Communicator implements SerialPortEventListener
         }
         catch (Exception e)
         {
-            logText = "Failed to close " + portName + "(" + e.toString() + ")";
+            logText = "Failed to close " + portName;
             logger.logEvent(logText);
             logger.logException(e);
         }
@@ -223,12 +220,12 @@ public class Communicator implements SerialPortEventListener
     			byte[] data = new byte[dataLength];
     			input.read(data);
     			String msg = new String(data);
-    			logger.logEvent("R: "+msg);
+    			//logger.logEvent("R: "+msg);
     			return msg;
             }
             catch (Exception e)
             {
-                logText = "Failed to read data. (" + e.toString() + ")";
+                logText = "Failed to read data.";
                 logger.logEvent(logText);
                 logger.logException(e);
                 return null;
@@ -239,33 +236,47 @@ public class Communicator implements SerialPortEventListener
     //method that can be called to send data
     //pre: open serial port
     //post: data sent to the other device
-    public void writeData(int leftThrottle, int rightThrottle)
+    public void writeData(String msg)
     {
         try
         {
-            output.write(leftThrottle);
-            output.flush();
-            //this is a delimiter for the data
-            output.write(DASH_ASCII);
-            output.flush();
-            
-            output.write(rightThrottle);
-            output.flush();
-            //will be read as a byte so it is a space key
-            output.write(SPACE_ASCII);
+            output.write(msg.getBytes());
             output.flush();
         }
         catch (Exception e)
         {
-            logText = "Failed to write data. (" + e.toString() + ")";
+            logText = "Failed to write data.";
             logger.logEvent(logText);
             logger.logException(e);
         }
     }
 
+    private String inputBuffer;
+    
 	@Override
 	public void serialEvent(SerialPortEvent arg0) {
-		
+		if(arg0.getEventType() == SerialPortEvent.DATA_AVAILABLE){
+			inputBuffer = inputBuffer + readData();
+			int sentenceEndIndex = inputBuffer.lastIndexOf("\r\n");
+			if(sentenceEndIndex == -1)
+				return;
+			int sentenceBeginIndex = inputBuffer.lastIndexOf("!!!",sentenceEndIndex);
+			if(sentenceBeginIndex == -1)
+				return;
+			
+			String inputSentence = inputBuffer.substring(sentenceBeginIndex, sentenceEndIndex);
+			inputBuffer = inputBuffer.substring(sentenceEndIndex);
+			
+			try {				
+				this.state.setVehicleState(CommParser.Parse(inputSentence));
+				logger.logEvent("S: "+inputSentence);
+			} catch (ParseException e) {
+				logger.logEvent("Parsing of sentence failed");
+				logger.logException(e);
+			}
+			
+			
+		}
 		// data came in.  update rolling buffer
 		// parse rolling buffer for complete sentences
 		//if complete sentence, update state and remove from buffer;

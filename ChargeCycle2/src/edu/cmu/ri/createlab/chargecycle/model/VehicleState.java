@@ -329,9 +329,31 @@ public class VehicleState {
 	public double getBikeSpeedMPH() {
 		return bikeSpeedMPH;
 	}
-	
-	
-	
+
+	@Override
+	public String toString() {
+		return  protocolVersion + ", " + firmwareVersion + ", "
+				+ hardwareVersion + ", " + dischargeEnable + ", "
+				+ prechargeEnable + ", " + sourceSelector + ", "
+				+ batteryCharging + ", " + key + ", " + capOverVoltage + ", "
+				+ requestedCapChargingCurrentAmps + ", "
+				+ capChargingCurrentAmps + ", " + altitude + ", " + ambientTemp
+				+ ", " + accelerometerX + ", " + accelerometerY + ", "
+				+ accelerometerZ + ", " + compassX + ", " + compassY + ", "
+				+ compassZ + ", " + gyroX + ", " + gyroY + ", " + gyroZ + ", "
+				+ throttlePot + ", " + throttleScale + ", " + throttleMax
+				+ ", " + throttleOuputToMotor + ", " + brakePot + ", "
+				+ brakeScale + ", " + brakeMax + ", " + brakeOutputToMotor
+				+ ", " + GPSLatitude + ", " + GPSLatHemisphere + ", "
+				+ GPSLongitude + ", " + GPSLonHemisphere + ", " + GPSWarning
+				+ ", " + motorCurrent + ", " + batteryCurrent + ", "
+				+ capacitorCurrent + ", " + battery1Voltage + ", "
+				+ battery0Voltage + ", " + capacitor1Voltage + ", "
+				+ capacitor0Voltage + ", " + battery1Temperature + ", "
+				+ battery0Temperature + ", " + capacitor1Temperature + ", "
+				+ capacitor0Temperature + ", " + bikeSpeedEncoderTicksAbsolute
+				+ ", " + bikeSpeedFPS + ", " + bikeSpeedMPH;
+	}
 	
 	
 	

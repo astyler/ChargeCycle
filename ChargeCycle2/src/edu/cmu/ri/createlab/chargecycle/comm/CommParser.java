@@ -6,11 +6,11 @@ public class CommParser {
 	public static VehicleState Parse(String comm) throws ParseException{
 		//Electric Bike MCU Data Protocol V1
 		String[] parts = comm.split(",");
-		if(parts.length != 51)
-			throw new ParseException("Badly formatted input string: " + comm);
+		if(parts.length != 50)
+			throw new ParseException("Badly formatted input string: expecting 50 parts, found "+parts.length);
 		if(!parts[0].equals("!!!"))
 			throw new ParseException("Missing starting sync sequence '!!!' in input string: "+comm);
-		if(!parts[1].equals("V1"))
+		if(!parts[1].equals("1"))
 			throw new ParseException("Incompatable protocol version; expecting V1, received "+parts[1]+" in input string: "+comm);
 		
 		return new VehicleState(parts[1], 		//String protocolVersion
