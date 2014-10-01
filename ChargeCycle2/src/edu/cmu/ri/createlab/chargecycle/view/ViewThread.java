@@ -4,6 +4,7 @@
 package edu.cmu.ri.createlab.chargecycle.view;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -21,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
@@ -40,11 +42,11 @@ public class ViewThread implements Runnable {
 	private final State state;
 	private final EventLogger logger;
 	private final DecimalFormat df = new DecimalFormat("0.00");
-	private final JLabel prechargeLabel = new JLabel("Precharging");
-	private final JLabel gpsLockLabel = new JLabel("GPS Lock");
-	private final JLabel dischargeLabel = new JLabel("Discharging");
-	private final JLabel chargingLabel = new JLabel("B Charging");
-	private final JLabel voltageLabel = new JLabel("Over Voltage");
+	private final JLabel prechargeLabel = new JLabel("<HTML>Capacitor<br>Precharge");
+	private final JLabel gpsLockLabel = new JLabel("<HTML><center>No GPS<br>Lock");
+	private final JLabel dischargeLabel = new JLabel("Discharge");
+	private final JLabel chargingLabel = new JLabel("<html><center>Battery<br>Charging");
+	private final JLabel voltageLabel = new JLabel("<HTML><center>Cap Over<br>Voltage");
 	private final JLabel keyLabel = new JLabel("Key");
 	private final JLabel capacitorLabel = new JLabel("Capacitor");
 	private final JLabel batteryLabel = new JLabel("Battery");
@@ -55,8 +57,11 @@ public class ViewThread implements Runnable {
 	private final JLabel motorCurrent = new JLabel("MC: 0.00 A");
 	
 	private final JTextArea logText = new JTextArea(10,60);
-	private final Color trueColor = Color.CYAN;
-	private final Color falseColor = Color.RED;
+	private final Color trueWarningColor = Color.RED;
+	private final Color falseWarningColor = new Color(80,0,0);
+	private final Color trueIndicatorColor = new Color(60,255,120);
+	private final Color falseIndicatorColor = new Color(20,85,40);
+	
 	private Timer updateDisplayTimer;
 	
 	public ViewThread(State state, EventLogger logger){
@@ -79,22 +84,28 @@ public class ViewThread implements Runnable {
        updateDisplayTimer.start();
 
 	}
-	private void updateLabel(JLabel label, boolean value){
-		label.setBackground(value ? trueColor : falseColor);		
+	private void updateWarning(JLabel label, boolean value){
+		label.setBackground(value ? trueWarningColor : falseWarningColor);		
+	}
+	
+	private void updateIndicator(JLabel label, boolean value){
+		label.setBackground(value ? trueIndicatorColor : falseIndicatorColor);		
 	}
 	
 	protected void updateDisplay() {
 		VehicleState vState = state.getVehicleState();
 		logText.setText(logger.getRecentLogText(10));
+		updateIndicator(keyLabel, true);
+		updateIndicator(prechargeLabel,false);
 		if(vState != null){
-			updateLabel(keyLabel, vState.isKey());
-			updateLabel(gpsLockLabel, !vState.isGPSWarning());
-			updateLabel(chargingLabel, vState.isBatteryCharging());
-			updateLabel(prechargeLabel,vState.isPrechargeEnable());
-			updateLabel(voltageLabel, vState.isCapOverVoltage());
-			updateLabel(dischargeLabel, vState.isDischargeEnable());
-			updateLabel(capacitorLabel, vState.isSourceSelector());
-			updateLabel(batteryLabel, !vState.isSourceSelector());
+			updateIndicator(keyLabel, vState.isKey());
+			updateWarning(gpsLockLabel, vState.isGPSWarning());
+			updateIndicator(chargingLabel, vState.isBatteryCharging());
+			updateIndicator(prechargeLabel,vState.isPrechargeEnable());
+			updateWarning(voltageLabel, vState.isCapOverVoltage());
+			updateIndicator(dischargeLabel, vState.isDischargeEnable());
+			updateIndicator(capacitorLabel, vState.isSourceSelector());
+			updateIndicator(batteryLabel, !vState.isSourceSelector());
 
 			battery0Voltage.setText("B1: "+df.format(vState.getBattery0Voltage()) +" V");
 			battery1Voltage.setText("B2: "+df.format(vState.getBattery1Voltage()) +" V");
@@ -141,36 +152,34 @@ public class ViewThread implements Runnable {
 			public void windowOpened(WindowEvent e) {
 			}
 	     });
-	     keyLabel.setOpaque(true);
-	     prechargeLabel.setOpaque(true);
-	     chargingLabel.setOpaque(true);
-	     dischargeLabel.setOpaque(true);
-	     voltageLabel.setOpaque(true);
-	     batteryLabel.setOpaque(true);
-	     capacitorLabel.setOpaque(true);
-	     gpsLockLabel.setOpaque(true);
+	     
+	    
+	     initLabel(keyLabel);
+	     initLabel(prechargeLabel);
+	     initLabel(chargingLabel);
+	     initLabel(dischargeLabel);
+	     initLabel(voltageLabel);
+	     initLabel(batteryLabel);
+	     initLabel(capacitorLabel);
+	     initLabel(gpsLockLabel);
 	     
 	     JPanel indicatorsPanel = new JPanel();
-	     indicatorsPanel.setLayout(new GridBagLayout());
-	     GridBagConstraints gbc = new GridBagConstraints(); 
-	     gbc.gridy = 0;
-	     gbc.gridx = 0;
-	     indicatorsPanel.add(keyLabel,gbc);
-	     gbc.gridx = 1;
-	     indicatorsPanel.add(gpsLockLabel, gbc);
-	     gbc.gridx = 2;
-	     indicatorsPanel.add(prechargeLabel, gbc);
-	     gbc.gridy = 1;
-	     gbc.gridx = 0;
-	     indicatorsPanel.add(chargingLabel, gbc);
-	     gbc.gridx = 1;
-	     indicatorsPanel.add(dischargeLabel, gbc);
-	     gbc.gridx = 2;
-	     indicatorsPanel.add(voltageLabel, gbc);
+	     indicatorsPanel.setLayout(new FlowLayout());
+		 indicatorsPanel.add(keyLabel);	     
+	     indicatorsPanel.add(chargingLabel);
+	     indicatorsPanel.add(dischargeLabel);
+	     indicatorsPanel.add(prechargeLabel);     
 	     indicatorsPanel.setBorder(BorderFactory.createTitledBorder("Indicators"));
 	     
+	     JPanel warningsPanel = new JPanel();
+	     warningsPanel.setLayout(new FlowLayout());
+	     warningsPanel.add(gpsLockLabel);
+	     warningsPanel.add(voltageLabel);
+	     warningsPanel.setBorder(BorderFactory.createTitledBorder("Warnings"));
+	     
 	     JPanel sourcePanel = new JPanel();
-	     sourcePanel.setLayout(new BoxLayout(sourcePanel, BoxLayout.Y_AXIS));
+//	     sourcePanel.setLayout(new BoxLayout(sourcePanel, BoxLayout.Y_AXIS));
+	     sourcePanel.setLayout(new FlowLayout());
 	     sourcePanel.setBorder(BorderFactory.createTitledBorder("Source"));
 	     sourcePanel.add(batteryLabel);
 	     sourcePanel.add(capacitorLabel);
@@ -188,14 +197,22 @@ public class ViewThread implements Runnable {
 	     logPanel.setBorder(BorderFactory.createTitledBorder("Event Log"));
 	     
 	     f.add(indicatorsPanel);
-	     f.add(gaugesPanel);
+	     f.add(warningsPanel);
+	    
 	     f.add(sourcePanel);
+	     f.add(gaugesPanel);
 	 	
 	     f.add(logPanel);
 	     f.pack();
 	     f.setVisible(true);
 	}
 
+	private void initLabel(JLabel label){
+		label.setOpaque(true);
+		label.setPreferredSize(new Dimension(65,40));
+		label.setBorder(BorderFactory.createBevelBorder(1));
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+	}
 
 	
 }
