@@ -2,6 +2,7 @@ package edu.cmu.ri.createlab.chargecycle;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -38,9 +39,10 @@ public class ChargeCycle{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+		int loopValue = 0;
 		while(state.isAlive()){	
 			try {
+				loopValue++;
 				VehicleState currState = state.getVehicleState();
 				
 				if(currState != prevState && currState != null){
@@ -50,12 +52,23 @@ public class ChargeCycle{
 				//do main thread stuff
 				Thread.sleep(100);
 				prevState = currState;
+				if(loopValue == 100 && currState == null && commThread.isDone() && commThread.get() == false){
+					eventLogger.logEvent("Retrying bike connect...");
+					commThread = new CommunicationsThread(state, comms, eventLogger);
+					commThread.execute();
+					loopValue = 0;
+				}
 			} catch (InterruptedException e) {
 				System.err.println("Main thread interrupted");
 				e.printStackTrace();
 			} catch (IOException e){
 				eventLogger.logEvent("Problem writing vehicle state");
 				eventLogger.logException(e);
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				eventLogger.logEvent("Problem with communication thread execution");
+				eventLogger.logException(e);
+				e.printStackTrace();
 				e.printStackTrace();
 			}
 			

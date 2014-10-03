@@ -6,6 +6,7 @@ package edu.cmu.ri.createlab.chargecycle.view;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -51,12 +52,12 @@ public class ViewThread implements Runnable {
 	private final JLabel capacitorLabel = new JLabel("Capacitor");
 	private final JLabel batteryLabel = new JLabel("Battery");
 	
-	private final JLabel battery0Voltage = new JLabel("B1: 0.00 V");
-	private final JLabel battery1Voltage = new JLabel("B: 0.00 V");
-	private final JLabel mphLabel = new JLabel("V: 0.00 MPH");
-	private final JLabel motorCurrent = new JLabel("MC: 0.00 A");
+	//private final JLabel battery0Voltage = new JLabel("B1: 0.00 V");
+	private final JLabel battery1Voltage = new JLabel("B: 00.00 V");
+	private final JLabel mphLabel = new JLabel("V: 00.00 MPH");
+	private final JLabel motorCurrent = new JLabel("MC: 000.00 A");
 	
-	private final JTextArea logText = new JTextArea(10,60);
+	private final JTextArea logText = new JTextArea(10,57);
 	private final Color trueWarningColor = Color.RED;
 	private final Color falseWarningColor = new Color(80,0,0);
 	private final Color trueIndicatorColor = new Color(60,255,120);
@@ -105,7 +106,7 @@ public class ViewThread implements Runnable {
 			updateIndicator(capacitorLabel, vState.isSourceSelector());
 			updateIndicator(batteryLabel, !vState.isSourceSelector());
 
-			battery0Voltage.setText("B1: "+df.format(vState.getBattery0Voltage()) +" V");
+			//battery0Voltage.setText("B1: "+df.format(vState.getBattery0Voltage()) +" V");
 			battery1Voltage.setText("B: "+df.format(vState.getBattery1Voltage()) +" V");
 			mphLabel.setText("V: "+df.format(vState.getBikeSpeedMPH())+" MPH");
 			motorCurrent.setText("MC: "+ df.format(vState.getMotorCurrent()) +" A");
@@ -151,15 +152,20 @@ public class ViewThread implements Runnable {
 			}
 	     });
 	     
+	     JPanel workingAreaPanel = new JPanel();
+	     workingAreaPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+	     workingAreaPanel.setLayout(new FlowLayout());
+	     workingAreaPanel.setPreferredSize(new Dimension(1024,500));
 	    
-	     initLabel(keyLabel);
-	     initLabel(prechargeLabel);
-	     initLabel(chargingLabel);
-	     initLabel(dischargeLabel);
-	     initLabel(voltageLabel);
-	     initLabel(batteryLabel);
-	     initLabel(capacitorLabel);
-	     initLabel(gpsLockLabel);
+	     initLabelIndicator(keyLabel);
+	     initLabelIndicator(prechargeLabel);
+	     initLabelIndicator(chargingLabel);
+	     initLabelIndicator(dischargeLabel);
+	     initLabelIndicator(voltageLabel);
+	     initLabelIndicator(batteryLabel);
+	     initLabelIndicator(capacitorLabel);
+	     initLabelIndicator(gpsLockLabel);
+	 
 	     
 	     JPanel indicatorsPanel = new JPanel();
 	     indicatorsPanel.setLayout(new FlowLayout());
@@ -183,34 +189,47 @@ public class ViewThread implements Runnable {
 	     sourcePanel.add(capacitorLabel);
 
 	     JPanel gaugesPanel = new JPanel();
+	     initLabelGauge(motorCurrent);
+	     initLabelGauge(mphLabel);
+	     //initLabelGauge(battery0Voltage);
+	     initLabelGauge(battery1Voltage);
+	       
 	     gaugesPanel.setLayout(new BoxLayout(gaugesPanel, BoxLayout.Y_AXIS));
 	     gaugesPanel.setBorder(BorderFactory.createTitledBorder("Gauges"));
 	     gaugesPanel.add(motorCurrent);
 	     gaugesPanel.add(mphLabel);
-	//     gaugesPanel.add(battery0Voltage);
+	//   gaugesPanel.add(battery0Voltage);
 	     gaugesPanel.add(battery1Voltage);
 	     
 	     JPanel logPanel = new JPanel();
 	     logPanel.add(logText);
+	     logText.setFont(logText.getFont().deriveFont(18f));
 	     logPanel.setBorder(BorderFactory.createTitledBorder("Event Log"));
 	     
-	     f.add(indicatorsPanel);
-	     f.add(warningsPanel);
+	     workingAreaPanel.add(indicatorsPanel);
+	     workingAreaPanel.add(warningsPanel);
 	    
-	     f.add(sourcePanel);
-	     f.add(gaugesPanel);
+	     workingAreaPanel.add(sourcePanel);
+	     workingAreaPanel.add(gaugesPanel);
 	 	
-	     f.add(logPanel);
+	     workingAreaPanel.add(logPanel);
+	     
+	     f.add(workingAreaPanel);
 	     f.pack();
 	     f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	     f.setVisible(true);
 	}
 
-	private void initLabel(JLabel label){
+	private void initLabelIndicator(JLabel label){
 		label.setOpaque(true);
-		label.setPreferredSize(new Dimension(65,40));
+		label.setPreferredSize(new Dimension(95,70));
 		label.setBorder(BorderFactory.createBevelBorder(1));
 		label.setHorizontalAlignment(SwingConstants.CENTER);
+		label.setFont(label.getFont().deriveFont(18f));
+	}
+	
+	private void initLabelGauge(JLabel label){
+		label.setFont(label.getFont().deriveFont(18f));
 	}
 
 	

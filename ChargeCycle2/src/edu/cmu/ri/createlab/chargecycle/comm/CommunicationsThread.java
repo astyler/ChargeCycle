@@ -57,7 +57,7 @@ public class CommunicationsThread extends SwingWorker<Boolean, Void>  {
 			logger.logEvent("No Ports Found! No communication established with bike");
 		
 		if(!comms.getConnected())
-			logger.logEvent("No bike found on serial communication.  Restart bike or contact Alex or Josh.");
+			logger.logEvent("No bike found.  Will retry in 10s.  Contact Josh if problem persists.");
 		//failed to connect
 		return false;
 	}
