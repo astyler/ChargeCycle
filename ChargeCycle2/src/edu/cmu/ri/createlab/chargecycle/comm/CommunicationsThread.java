@@ -1,9 +1,11 @@
 package edu.cmu.ri.createlab.chargecycle.comm;
 
 import java.util.List;
+
 import javax.swing.SwingWorker;
-import edi.cmu.ri.createlab.chargecycle.logging.EventLogger;
+
 import gnu.io.CommPortIdentifier;
+import edu.cmu.ri.createlab.chargecycle.logging.EventLogger;
 import edu.cmu.ri.createlab.chargecycle.model.State;
 
 

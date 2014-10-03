@@ -4,7 +4,7 @@ package edu.cmu.ri.createlab.chargecycle.comm;
 Adapted from code from http://henrypoon.wordpress.com/
  */
 
-import edi.cmu.ri.createlab.chargecycle.logging.EventLogger;
+import edu.cmu.ri.createlab.chargecycle.logging.EventLogger;
 import edu.cmu.ri.createlab.chargecycle.model.State;
 import gnu.io.*;
 

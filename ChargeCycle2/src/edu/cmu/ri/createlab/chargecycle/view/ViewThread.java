@@ -27,7 +27,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
-import edi.cmu.ri.createlab.chargecycle.logging.EventLogger;
+import edu.cmu.ri.createlab.chargecycle.logging.EventLogger;
 import edu.cmu.ri.createlab.chargecycle.model.State;
 import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 

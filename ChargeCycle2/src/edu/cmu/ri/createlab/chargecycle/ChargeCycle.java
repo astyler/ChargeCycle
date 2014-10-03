@@ -7,10 +7,10 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import edi.cmu.ri.createlab.chargecycle.logging.EventLogger;
-import edi.cmu.ri.createlab.chargecycle.logging.StateLogger;
 import edu.cmu.ri.createlab.chargecycle.comm.CommunicationsThread;
 import edu.cmu.ri.createlab.chargecycle.comm.Communicator;
+import edu.cmu.ri.createlab.chargecycle.logging.EventLogger;
+import edu.cmu.ri.createlab.chargecycle.logging.StateLogger;
 import edu.cmu.ri.createlab.chargecycle.model.State;
 import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 import edu.cmu.ri.createlab.chargecycle.view.ViewThread;

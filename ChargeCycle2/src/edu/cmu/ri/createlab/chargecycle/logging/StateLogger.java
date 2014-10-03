@@ -1,4 +1,4 @@
-package edi.cmu.ri.createlab.chargecycle.logging;
+package edu.cmu.ri.createlab.chargecycle.logging;
 
 import java.io.File;
 import java.io.FileWriter;
