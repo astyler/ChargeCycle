@@ -40,7 +40,7 @@ public class State {
 	public void setVehicleState(VehicleState newState){
 		//updating references is atomic and need not be synchronized
 		this.vehicle = newState;
-		if(newState.isKey() == false)
+		if(newState.isKey() == false && newState.isBatteryCharging() == false)
 			setAlive(false);
 		
 	}

@@ -52,7 +52,7 @@ public class ViewThread implements Runnable {
 	private final JLabel batteryLabel = new JLabel("Battery");
 	
 	private final JLabel battery0Voltage = new JLabel("B1: 0.00 V");
-	private final JLabel battery1Voltage = new JLabel("B2: 0.00 V");
+	private final JLabel battery1Voltage = new JLabel("B: 0.00 V");
 	private final JLabel mphLabel = new JLabel("V: 0.00 MPH");
 	private final JLabel motorCurrent = new JLabel("MC: 0.00 A");
 	
@@ -106,7 +106,7 @@ public class ViewThread implements Runnable {
 			updateIndicator(batteryLabel, !vState.isSourceSelector());
 
 			battery0Voltage.setText("B1: "+df.format(vState.getBattery0Voltage()) +" V");
-			battery1Voltage.setText("B2: "+df.format(vState.getBattery1Voltage()) +" V");
+			battery1Voltage.setText("B: "+df.format(vState.getBattery1Voltage()) +" V");
 			mphLabel.setText("V: "+df.format(vState.getBikeSpeedMPH())+" MPH");
 			motorCurrent.setText("MC: "+ df.format(vState.getMotorCurrent()) +" A");
 
@@ -187,7 +187,7 @@ public class ViewThread implements Runnable {
 	     gaugesPanel.setBorder(BorderFactory.createTitledBorder("Gauges"));
 	     gaugesPanel.add(motorCurrent);
 	     gaugesPanel.add(mphLabel);
-	     gaugesPanel.add(battery0Voltage);
+	//     gaugesPanel.add(battery0Voltage);
 	     gaugesPanel.add(battery1Voltage);
 	     
 	     JPanel logPanel = new JPanel();
@@ -202,6 +202,7 @@ public class ViewThread implements Runnable {
 	 	
 	     f.add(logPanel);
 	     f.pack();
+	     f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	     f.setVisible(true);
 	}
 

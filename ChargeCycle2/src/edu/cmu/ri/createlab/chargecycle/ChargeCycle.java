@@ -76,7 +76,7 @@ public class ChargeCycle{
 		}
 		
 		VehicleState vState = state.getVehicleState();
-		if(vState != null && vState.isKey() == false)
+		if(vState != null && vState.isKey() == false && vState.isBatteryCharging() == false)
 		{
 			Runtime.getRuntime().exec("pmset sleepnow");
 		}
