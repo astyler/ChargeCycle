@@ -30,13 +30,17 @@ public class StateLogger {
 	public synchronized void writeState(VehicleState vState) throws IOException{
 		fw.write(logDateFormat.format(Calendar.getInstance().getTime())+", ");
 		fw.write(vState.toString());
-		fw.write(System.lineSeparator());
+	//	fw.write(System.lineSeparator());
+		fw.write(System.getProperty("line.separator"));
+
 	}
 	
 	public synchronized void writeString(String msg) throws IOException{
 		fw.write(logDateFormat.format(Calendar.getInstance().getTime())+", ");
 		fw.write(msg);
-		fw.write(System.lineSeparator());
+		//fw.write(System.lineSeparator());
+		fw.write(System.getProperty("line.separator"));
+
 	}
 	
 	public synchronized void stopLogging() throws IOException{

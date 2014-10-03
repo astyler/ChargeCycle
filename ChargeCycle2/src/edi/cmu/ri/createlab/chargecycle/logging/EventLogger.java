@@ -38,7 +38,8 @@ public class EventLogger {
 		FileWriter fw = new FileWriter(log, true);
 		for(String s : logBuffer){
 			fw.write(s);
-			fw.write(System.lineSeparator());
+			//fw.write(System.lineSeparator());
+			fw.write(System.getProperty("line.separator"));
 		}
 		fw.close();
 		logBuffer.clear();

@@ -38,10 +38,7 @@ public class Communicator implements SerialPortEventListener
     private InputStream input = null;
     private OutputStream output = null;
 
-    //just a boolean flag that i use for enabling
-    //and disabling buttons depending on whether the program
-    //is connected to a serial port or not
-    private boolean bConnected = false;
+    private boolean connected = false;
 
     //the timeout value for connecting with the port
     final static int TIMEOUT = 2000;
@@ -102,8 +99,7 @@ public class Communicator implements SerialPortEventListener
             //the CommPort object can be casted to a SerialPort object
             serialPort = (SerialPort)commPort;
 
-            //for controlling GUI elements
- //           setConnected(true);
+            setConnected(true);
            
             //logging
             logText = portName + " opened successfully.";
@@ -138,21 +134,18 @@ public class Communicator implements SerialPortEventListener
     public boolean initIOStream()
     {
         //return value for whether opening the streams is successful or not
-        boolean successful = false;
 
         try {
             //
             input = serialPort.getInputStream();
             output = serialPort.getOutputStream();
-            
-            successful = true;
-            return successful;
+            return true;
         }
         catch (IOException e) {
             logText = "I/O Streams failed to open.";
             logger.logEvent(logText);
             logger.logException(e);
-            return successful;
+            return false;
         }
     }
 
@@ -202,12 +195,12 @@ public class Communicator implements SerialPortEventListener
 
     final public boolean getConnected()
     {
-        return bConnected;
+        return connected;
     }
 
-    public void setConnected(boolean bConnected)
+    public void setConnected(boolean connected)
     {
-        this.bConnected = bConnected;
+        this.connected = connected;
     }
 
     //what happens when data is received

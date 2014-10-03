@@ -95,8 +95,6 @@ public class ViewThread implements Runnable {
 	protected void updateDisplay() {
 		VehicleState vState = state.getVehicleState();
 		logText.setText(logger.getRecentLogText(10));
-		updateIndicator(keyLabel, true);
-		updateIndicator(prechargeLabel,false);
 		if(vState != null){
 			updateIndicator(keyLabel, vState.isKey());
 			updateWarning(gpsLockLabel, vState.isGPSWarning());

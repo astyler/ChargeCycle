@@ -7,7 +7,7 @@ import gnu.io.CommPortIdentifier;
 import edu.cmu.ri.createlab.chargecycle.model.State;
 
 
-public class CommunicationsThread extends SwingWorker<Boolean, String>  {
+public class CommunicationsThread extends SwingWorker<Boolean, Void>  {
 
 	private final Communicator comms;
 	private final EventLogger logger;
@@ -40,20 +40,24 @@ public class CommunicationsThread extends SwingWorker<Boolean, String>  {
 				continue;
 			}		
 			
+			
 			comms.initIOStream();
 			comms.initListener();
 			
 			Thread.sleep(1000);
 			if(this.state.getVehicleState() != null){
-				logger.logEvent("Bike found");
+				logger.logEvent("Bike found, logging data");
 				return true;
 			}
-			logger.logEvent("Disconnecting");
+			logger.logEvent("Not the bike, disconnecting");
 			comms.disconnect();	
 		}
 			
 		if(ports.isEmpty())
 			logger.logEvent("No Ports Found! No communication established with bike");
+		
+		if(!comms.getConnected())
+			logger.logEvent("No bike found on serial communication.  Restart bike or contact Alex or Josh.");
 		//failed to connect
 		return false;
 	}

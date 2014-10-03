@@ -15,7 +15,7 @@ import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 import edu.cmu.ri.createlab.chargecycle.view.ViewThread;
 
 public class ChargeCycle{	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		File logFileDirectory = new File(args[0]);		
 		
 		
@@ -26,7 +26,7 @@ public class ChargeCycle{
 		
 		SwingUtilities.invokeLater(new ViewThread(state, eventLogger));
 		
-		SwingWorker<Boolean, String> commThread = new CommunicationsThread(state, comms, eventLogger);
+		SwingWorker<Boolean, Void> commThread = new CommunicationsThread(state, comms, eventLogger);
 		commThread.execute();
 		
 		//state will be alive until window is closed, comms fail to establish,
@@ -60,6 +60,7 @@ public class ChargeCycle{
 			}
 			
 		}	
+		prevState = null;
 		eventLogger.logEvent("Killing communications...");		
 		commThread.cancel(true);
 		if(comms.getConnected())
@@ -74,6 +75,11 @@ public class ChargeCycle{
 			e.printStackTrace();
 		}
 		
+		VehicleState vState = state.getVehicleState();
+		if(vState != null && vState.isKey() == false)
+		{
+			Runtime.getRuntime().exec("pmset sleepnow");
+		}
 		System.exit(0);
 	}
 
