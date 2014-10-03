@@ -152,10 +152,6 @@ public class ViewThread implements Runnable {
 			}
 	     });
 	     
-	     JPanel workingAreaPanel = new JPanel();
-	     workingAreaPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-	     workingAreaPanel.setLayout(new FlowLayout());
-	     workingAreaPanel.setPreferredSize(new Dimension(1024,500));
 	    
 	     initLabelIndicator(keyLabel);
 	     initLabelIndicator(prechargeLabel);
@@ -206,15 +202,13 @@ public class ViewThread implements Runnable {
 	     logText.setFont(logText.getFont().deriveFont(18f));
 	     logPanel.setBorder(BorderFactory.createTitledBorder("Event Log"));
 	     
-	     workingAreaPanel.add(indicatorsPanel);
-	     workingAreaPanel.add(warningsPanel);
+	     f.add(indicatorsPanel);
+	     f.add(warningsPanel);
 	    
-	     workingAreaPanel.add(sourcePanel);
-	     workingAreaPanel.add(gaugesPanel);
+	     f.add(sourcePanel);
+	     f.add(gaugesPanel);
 	 	
-	     workingAreaPanel.add(logPanel);
-	     
-	     f.add(workingAreaPanel);
+	     f.add(logPanel);
 	     f.pack();
 	     f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	     f.setVisible(true);
