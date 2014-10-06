@@ -32,7 +32,7 @@ public class ChargeCycle{
 		
 		//state will be alive until window is closed, comms fail to establish,
 		//or comms establish and then the key is turned off
-		VehicleState prevState = state.getVehicleState();
+		//VehicleState prevState = state.getVehicleState();
 		try {
 			stateLogger.startLogging();
 		} catch (IOException e1) {
@@ -45,13 +45,21 @@ public class ChargeCycle{
 				loopValue++;
 				VehicleState currState = state.getVehicleState();
 				
-				if(currState != prevState && currState != null){
-					stateLogger.writeState(currState);
+				//if(currState != prevState && currState != null){
+				if(currState != null){
+					//set state logging frequency based on state:
+					//if charging, every 50 loops, or about 5 seconds
+					//if not, every 5 loops, or about half a second
+					int recordingFrequency = currState.isBatteryCharging() ? 50 : 5; 
+					
+					if(loopValue % recordingFrequency == 0){
+						stateLogger.writeState(currState);
+					}
 				}
 				//eventLogger.flushLog();
 				//do main thread stuff
 				Thread.sleep(100);
-				prevState = currState;
+			//	prevState = currState;
 				if(loopValue == 100 && currState == null && commThread.isDone() && commThread.get() == false){
 					eventLogger.logEvent("Retrying bike connect...");
 					commThread = new CommunicationsThread(state, comms, eventLogger);
