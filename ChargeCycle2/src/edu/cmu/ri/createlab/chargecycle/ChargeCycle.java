@@ -81,7 +81,7 @@ public class ChargeCycle{
 			}
 			
 		}	
-		prevState = null;
+		//prevState = null;
 		eventLogger.logEvent("Killing communications...");		
 		commThread.cancel(true);
 		if(comms.getConnected())

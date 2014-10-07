@@ -55,7 +55,7 @@ public class ViewThread implements Runnable {
 	//private final JLabel battery0Voltage = new JLabel("B1: 0.00 V");
 	private final JLabel battery1Voltage = new JLabel("B: 00.00 V");
 	private final JLabel mphLabel = new JLabel("V: 00.00 MPH");
-	private final JLabel motorCurrent = new JLabel("MC: 000.00 A");
+	private final JLabel batteryCurrent = new JLabel("BC: 000.00 A");
 	
 	private final JTextArea logText = new JTextArea(10,57);
 	private final Color trueWarningColor = Color.RED;
@@ -109,7 +109,7 @@ public class ViewThread implements Runnable {
 			//battery0Voltage.setText("B1: "+df.format(vState.getBattery0Voltage()) +" V");
 			battery1Voltage.setText("B: "+df.format(vState.getBattery1Voltage()) +" V");
 			mphLabel.setText("V: "+df.format(vState.getBikeSpeedMPH())+" MPH");
-			motorCurrent.setText("MC: "+ df.format(vState.getMotorCurrent()) +" A");
+			batteryCurrent.setText("BC: "+ df.format(vState.getBatteryCurrent()) +" A");
 
 		}
 	}
@@ -185,14 +185,14 @@ public class ViewThread implements Runnable {
 	     sourcePanel.add(capacitorLabel);
 
 	     JPanel gaugesPanel = new JPanel();
-	     initLabelGauge(motorCurrent);
+	     initLabelGauge(batteryCurrent);
 	     initLabelGauge(mphLabel);
 	     //initLabelGauge(battery0Voltage);
 	     initLabelGauge(battery1Voltage);
 	       
 	     gaugesPanel.setLayout(new BoxLayout(gaugesPanel, BoxLayout.Y_AXIS));
 	     gaugesPanel.setBorder(BorderFactory.createTitledBorder("Gauges"));
-	     gaugesPanel.add(motorCurrent);
+	     gaugesPanel.add(batteryCurrent);
 	     gaugesPanel.add(mphLabel);
 	//   gaugesPanel.add(battery0Voltage);
 	     gaugesPanel.add(battery1Voltage);
