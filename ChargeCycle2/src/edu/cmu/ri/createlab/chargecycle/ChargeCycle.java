@@ -40,6 +40,7 @@ public class ChargeCycle{
 			e1.printStackTrace();
 		}
 		int loopValue = 0;
+		
 		while(state.isAlive()){	
 			try {
 				loopValue++;
@@ -60,7 +61,7 @@ public class ChargeCycle{
 				//do main thread stuff
 				Thread.sleep(100);
 			//	prevState = currState;
-				if(loopValue == 100 && currState == null && commThread.isDone() && commThread.get() == false){
+				if(loopValue == 100 && (currState == null || comms.getConnected() == false) && commThread.isDone()){
 					eventLogger.logEvent("Retrying bike connect...");
 					commThread = new CommunicationsThread(state, comms, eventLogger);
 					commThread.execute();
@@ -73,13 +74,7 @@ public class ChargeCycle{
 				eventLogger.logEvent("Problem writing vehicle state");
 				eventLogger.logException(e);
 				e.printStackTrace();
-			} catch (ExecutionException e) {
-				eventLogger.logEvent("Problem with communication thread execution");
-				eventLogger.logException(e);
-				e.printStackTrace();
-				e.printStackTrace();
-			}
-			
+			}			
 		}	
 		//prevState = null;
 		eventLogger.logEvent("Killing communications...");		
