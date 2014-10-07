@@ -13,44 +13,46 @@ public class EventLogger {
 	private final boolean debug;
 	private final DateFormat df = DateFormat.getDateTimeInstance();
 	private final File log;
-	
-	public EventLogger(File logFile, boolean debug){
+
+	public EventLogger(File logFile, boolean debug) {
 		this.logBuffer = new ArrayList<String>();
 		this.debug = debug;
 		this.log = logFile;
 	}
-	
-	public synchronized void logException(Exception x){
-		logBuffer.add("ERR: " + df.format(Calendar.getInstance().getTime()) + " : " + x.toString());
-		if(!debug) return;
-		for(StackTraceElement e : x.getStackTrace()){
-			logBuffer.add(e.toString());
+
+	public synchronized void logException(Exception x) {
+		this.logBuffer.add("ERR: " + this.df.format(Calendar.getInstance().getTime()) + " : " + x.toString());
+		if (!this.debug) {
+			return;
+		}
+		for (StackTraceElement e : x.getStackTrace()) {
+			this.logBuffer.add(e.toString());
 		}
 	}
-	
-	public synchronized void logEvent(String msg){
-		logBuffer.add(df.format(Calendar.getInstance().getTime()) + " : " + msg);
+
+	public synchronized void logEvent(String msg) {
+		this.logBuffer.add(this.df.format(Calendar.getInstance().getTime()) + " : " + msg);
 	}
-	
-	public synchronized void flushLog() throws IOException{
-		log.getParentFile().mkdirs();
-		log.createNewFile();
-		FileWriter fw = new FileWriter(log, true);
-		for(String s : logBuffer){
+
+	public synchronized void flushLog() throws IOException {
+		this.log.getParentFile().mkdirs();
+		this.log.createNewFile();
+		FileWriter fw = new FileWriter(this.log, true);
+		for (String s : this.logBuffer) {
 			fw.write(s);
-			//fw.write(System.lineSeparator());
+			// fw.write(System.lineSeparator());
 			fw.write(System.getProperty("line.separator"));
 		}
 		fw.close();
-		logBuffer.clear();
+		this.logBuffer.clear();
 	}
-	
-	public synchronized String getRecentLogText(int lines){
-		int endIndex = logBuffer.size(); // exclusive
+
+	public synchronized String getRecentLogText(int lines) {
+		int endIndex = this.logBuffer.size(); // exclusive
 		int fromIndex = endIndex - lines;
 		fromIndex = fromIndex < 0 ? 0 : fromIndex;
 		StringBuilder sb = new StringBuilder();
-		for(String s: logBuffer.subList(fromIndex, endIndex)){
+		for (String s : this.logBuffer.subList(fromIndex, endIndex)) {
 			sb.append(s).append("\n");
 		}
 		return sb.toString();
