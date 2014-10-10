@@ -23,7 +23,7 @@ public class ChargeCycle {
 		Communicator comms = new Communicator(eventLogger, state);
 		StateLogger stateLogger = new StateLogger(logFileDirectory);
 
-		SwingUtilities.invokeLater(new ViewThread(state, eventLogger));
+		SwingUtilities.invokeLater(new ViewThread(state, eventLogger, logFileDirectory));
 
 		SwingWorker<Boolean, Void> commThread = new CommunicationsThread(state, comms, eventLogger);
 		commThread.execute();

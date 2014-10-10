@@ -11,11 +11,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.FileFilter;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JComponent;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -66,7 +68,8 @@ public class ViewThread implements Runnable {
 	
 	//analysis panel and components
 	private final JPanel analysisPanel = new JPanel();
-	
+	private final File logFileDirectory;
+	private final JComboBox<LogFile> logSelectorBox = new JComboBox<LogFile>();
 	
 	
 	private final Color trueWarningColor = Color.RED;
@@ -80,9 +83,10 @@ public class ViewThread implements Runnable {
 	private boolean priorKey = false;
 	private boolean priorCharge = false;
 	
-	public ViewThread(State state, EventLogger logger) {
+	public ViewThread(State state, EventLogger logger, File logFileDirectory) {
 		this.state = state;
 		this.logger = logger;
+		this.logFileDirectory = logFileDirectory;
 	}
 
 	@Override
@@ -224,6 +228,52 @@ public class ViewThread implements Runnable {
 
 	private void initAnalysisPanel(){
 		//add components here
+		for(File f : this.logFileDirectory.listFiles()){
+			if(f.getName().contains("CCLog")){
+				this.logSelectorBox.addItem(new LogFile(f));
+			}
+		}
+		
+		this.logSelectorBox.addActionListener(new ActionListener() {
+            
+			@Override
+            public void actionPerformed(ActionEvent e) {    
+                LogFile s = (LogFile) logSelectorBox.getSelectedItem();
+                analyzeAndDisplay(s);
+            }
+			
+		});
+		
+		this.analysisPanel.add(this.logSelectorBox);
+	}
+	
+	private void analyzeAndDisplay(LogFile f){
+		
+	}
+	private class LogFile{
+		private final File f;
+		private final String id;
+		
+		LogFile(File f){
+			this.f = f;
+			this.id = createName(f);
+		}
+		
+		private String createName(File f){
+			String fileName = f.getName();
+			String datetime = fileName.substring(fileName.indexOf('_')+1, fileName.indexOf('.'));
+			String date = datetime.substring(0, datetime.indexOf('_')).replace('-', '/');
+			String time = datetime.substring(datetime.indexOf('_')+2).replace('-', ':');
+			return date+" "+time;
+		}
+		
+		public String toString(){
+			return id;
+		}
+		
+		public File getFile(){
+			return this.f;
+		}
 	}
 	
 	private void initLogPanel(){
