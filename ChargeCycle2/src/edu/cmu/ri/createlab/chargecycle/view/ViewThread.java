@@ -15,9 +15,11 @@ import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
@@ -40,6 +42,11 @@ public class ViewThread implements Runnable {
 	private final State state;
 	private final EventLogger logger;
 	private final DecimalFormat df = new DecimalFormat("0.00");
+	
+	private final JTabbedPane mainWindow = new JTabbedPane();
+	
+	//sensor panel and components
+	private final JPanel sensorPanel = new JPanel();
 	private final JLabel prechargeLabel = new JLabel("<HTML>Capacitor<br>Precharge");
 	private final JLabel gpsLockLabel = new JLabel("<HTML><center>No GPS<br>Lock");
 	private final JLabel dischargeLabel = new JLabel("Discharge");
@@ -48,13 +55,20 @@ public class ViewThread implements Runnable {
 	private final JLabel keyLabel = new JLabel("Key");
 	private final JLabel capacitorLabel = new JLabel("Capacitor");
 	private final JLabel batteryLabel = new JLabel("Battery");
-
 	// private final JLabel battery0Voltage = new JLabel("B1: 0.00 V");
 	private final JLabel battery1Voltage = new JLabel("B: 00.00 V");
 	private final JLabel mphLabel = new JLabel("V: 00.00 MPH");
 	private final JLabel batteryCurrent = new JLabel("BC: 000.00 A");
 
-	private final JTextArea logText = new JTextArea(10, 57);
+	//logging panel and components
+	private final JPanel logPanel = new JPanel();
+	private final JTextArea logText = new JTextArea(10,57);
+	
+	//analysis panel and components
+	private final JPanel analysisPanel = new JPanel();
+	
+	
+	
 	private final Color trueWarningColor = Color.RED;
 	private final Color falseWarningColor = new Color(80, 0, 0);
 	private final Color trueIndicatorColor = new Color(60, 255, 120);
@@ -62,6 +76,10 @@ public class ViewThread implements Runnable {
 
 	private Timer updateDisplayTimer;
 
+	//for automatic tab switching when vehicle state changes
+	private boolean priorKey = false;
+	private boolean priorCharge = false;
+	
 	public ViewThread(State state, EventLogger logger) {
 		this.state = state;
 		this.logger = logger;
@@ -92,8 +110,43 @@ public class ViewThread implements Runnable {
 	}
 
 	protected void updateDisplay() {
-		VehicleState vState = this.state.getVehicleState();
+		VehicleState vState = state.getVehicleState();
+		
+		if(vState != null){
+			if( !this.priorCharge && vState.isBatteryCharging() ){
+				//battery just started charging, change to analysis panel
+				this.mainWindow.setSelectedComponent(this.analysisPanel);
+			}
+			else if( !this.priorKey && vState.isKey() ){
+				//key just turned on, switch to sensors panel
+				this.mainWindow.setSelectedComponent(this.sensorPanel);
+			}
+			else if( this.priorCharge && !vState.isBatteryCharging() && vState.isKey() ){
+				//we just stopped charging, and key is on, switch to sensors panel
+				this.mainWindow.setSelectedComponent(this.sensorPanel);
+			}
+			
+			this.priorCharge = vState.isBatteryCharging();
+			this.priorKey = vState.isKey();
+		}
+		
+		JPanel selected = (JPanel) mainWindow.getSelectedComponent();
+		
+		if(selected == sensorPanel){
+			updateSensorPanel();
+		}
+		else if(selected  == logPanel){
+			updateLogPanel();
+		}
+		
+	}
+
+	private void updateLogPanel() {
 		this.logText.setText(this.logger.getRecentLogText(10));
+	}
+
+	private void updateSensorPanel() {
+		VehicleState vState = state.getVehicleState();
 		if (vState != null) {
 			this.updateIndicator(this.keyLabel, vState.isKey());
 			this.updateWarning(this.gpsLockLabel, vState.isGPSWarning());
@@ -117,7 +170,7 @@ public class ViewThread implements Runnable {
 		JFrame f = new JFrame("ChargeCycle Information");
 		// Sets the behavior for when the window is closed
 		f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		f.setLayout(new FlowLayout());
+		
 		f.addWindowListener(new WindowListener() {
 			@Override
 			public void windowActivated(WindowEvent arg0) {
@@ -153,6 +206,35 @@ public class ViewThread implements Runnable {
 			}
 		});
 
+		mainWindow.add("Sensors", sensorPanel);
+		mainWindow.add("Log", logPanel);
+		mainWindow.add("Analysis", analysisPanel);
+		
+		initSensorPanel();
+		initLogPanel();
+		initAnalysisPanel();
+		
+		mainWindow.setSelectedComponent(logPanel);
+		f.add(mainWindow);
+
+		f.pack();
+		f.setExtendedState(Frame.MAXIMIZED_BOTH);
+		f.setVisible(true);
+	}
+
+	private void initAnalysisPanel(){
+		//add components here
+	}
+	
+	private void initLogPanel(){
+		this.logPanel.add(this.logText);
+		this.logText.setFont(this.logText.getFont().deriveFont(18f));
+		this.logText.setBorder(BorderFactory.createTitledBorder("Event Log"));
+	}
+	
+	private void initSensorPanel() {
+		this.sensorPanel.setLayout(new FlowLayout());
+		
 		this.initLabelIndicator(this.keyLabel);
 		this.initLabelIndicator(this.prechargeLabel);
 		this.initLabelIndicator(this.chargingLabel);
@@ -188,29 +270,17 @@ public class ViewThread implements Runnable {
 		this.initLabelGauge(this.mphLabel);
 		// initLabelGauge(battery0Voltage);
 		this.initLabelGauge(this.battery1Voltage);
-
 		gaugesPanel.setLayout(new BoxLayout(gaugesPanel, BoxLayout.Y_AXIS));
 		gaugesPanel.setBorder(BorderFactory.createTitledBorder("Gauges"));
 		gaugesPanel.add(this.batteryCurrent);
 		gaugesPanel.add(this.mphLabel);
 		// gaugesPanel.add(battery0Voltage);
 		gaugesPanel.add(this.battery1Voltage);
-
-		JPanel logPanel = new JPanel();
-		logPanel.add(this.logText);
-		this.logText.setFont(this.logText.getFont().deriveFont(18f));
-		logPanel.setBorder(BorderFactory.createTitledBorder("Event Log"));
-
-		f.add(indicatorsPanel);
-		f.add(warningsPanel);
-
-		f.add(sourcePanel);
-		f.add(gaugesPanel);
-
-		f.add(logPanel);
-		f.pack();
-		f.setExtendedState(Frame.MAXIMIZED_BOTH);
-		f.setVisible(true);
+		
+		sensorPanel.add(indicatorsPanel);
+		sensorPanel.add(warningsPanel);
+		sensorPanel.add(sourcePanel);
+		sensorPanel.add(gaugesPanel);
 	}
 
 	private void initLabelIndicator(JLabel label) {
