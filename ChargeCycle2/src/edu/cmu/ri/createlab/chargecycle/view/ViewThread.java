@@ -43,40 +43,14 @@ public class ViewThread implements Runnable {
 	 */
 	private final State state;
 	private final EventLogger logger;
-	private final DecimalFormat df = new DecimalFormat("0.00");
-	
+
 	private final JTabbedPane mainWindow = new JTabbedPane();
 	
-	//sensor panel and components
-	private final JPanel sensorPanel = new JPanel();
-	private final JLabel prechargeLabel = new JLabel("<HTML>Capacitor<br>Precharge");
-	private final JLabel gpsLockLabel = new JLabel("<HTML><center>No GPS<br>Lock");
-	private final JLabel dischargeLabel = new JLabel("Discharge");
-	private final JLabel chargingLabel = new JLabel("<html><center>Battery<br>Charging");
-	private final JLabel voltageLabel = new JLabel("<HTML><center>Cap Over<br>Voltage");
-	private final JLabel keyLabel = new JLabel("Key");
-	private final JLabel capacitorLabel = new JLabel("Capacitor");
-	private final JLabel batteryLabel = new JLabel("Battery");
-	// private final JLabel battery0Voltage = new JLabel("B1: 0.00 V");
-	private final JLabel battery1Voltage = new JLabel("B: 00.00 V");
-	private final JLabel mphLabel = new JLabel("V: 00.00 MPH");
-	private final JLabel batteryCurrent = new JLabel("BC: 000.00 A");
-
-	//logging panel and components
-	private final JPanel logPanel = new JPanel();
-	private final JTextArea logText = new JTextArea(10,57);
+	//panels for main window
+	private final SensorPanel sensorPanel;
+	private final LogPanel logPanel;
+	private final AnalysisPanel analysisPanel;
 	
-	//analysis panel and components
-	private final JPanel analysisPanel = new JPanel();
-	private final File logFileDirectory;
-	private final JComboBox<LogFile> logSelectorBox = new JComboBox<LogFile>();
-	
-	
-	private final Color trueWarningColor = Color.RED;
-	private final Color falseWarningColor = new Color(80, 0, 0);
-	private final Color trueIndicatorColor = new Color(60, 255, 120);
-	private final Color falseIndicatorColor = new Color(20, 85, 40);
-
 	private Timer updateDisplayTimer;
 
 	//for automatic tab switching when vehicle state changes
@@ -86,7 +60,9 @@ public class ViewThread implements Runnable {
 	public ViewThread(State state, EventLogger logger, File logFileDirectory) {
 		this.state = state;
 		this.logger = logger;
-		this.logFileDirectory = logFileDirectory;
+		this.sensorPanel = new SensorPanel();
+		this.logPanel = new LogPanel(logger);
+		this.analysisPanel = new AnalysisPanel(logFileDirectory);
 	}
 
 	@Override
@@ -103,14 +79,6 @@ public class ViewThread implements Runnable {
 
 		this.updateDisplayTimer.start();
 
-	}
-
-	private void updateWarning(JLabel label, boolean value) {
-		label.setBackground(value ? this.trueWarningColor : this.falseWarningColor);
-	}
-
-	private void updateIndicator(JLabel label, boolean value) {
-		label.setBackground(value ? this.trueIndicatorColor : this.falseIndicatorColor);
 	}
 
 	protected void updateDisplay() {
@@ -137,37 +105,15 @@ public class ViewThread implements Runnable {
 		JPanel selected = (JPanel) mainWindow.getSelectedComponent();
 		
 		if(selected == sensorPanel){
-			updateSensorPanel();
+			this.sensorPanel.updatePanel(state);
 		}
 		else if(selected  == logPanel){
-			updateLogPanel();
+			this.logPanel.updatePanel();
+		}
+		else if(selected == analysisPanel){
+			this.analysisPanel.updatePanel();
 		}
 		
-	}
-
-	private void updateLogPanel() {
-		this.logText.setText(this.logger.getRecentLogText(10));
-	}
-
-	private void updateSensorPanel() {
-		VehicleState vState = state.getVehicleState();
-		if (vState != null) {
-			this.updateIndicator(this.keyLabel, vState.isKey());
-			this.updateWarning(this.gpsLockLabel, vState.isGPSWarning());
-			this.updateIndicator(this.chargingLabel, vState.isBatteryCharging());
-			this.updateIndicator(this.prechargeLabel, vState.isPrechargeEnable());
-			this.updateWarning(this.voltageLabel, vState.isCapOverVoltage());
-			this.updateIndicator(this.dischargeLabel, vState.isDischargeEnable());
-			this.updateIndicator(this.capacitorLabel, vState.isSourceSelector());
-			this.updateIndicator(this.batteryLabel, !vState.isSourceSelector());
-
-			// battery0Voltage.setText("B1: "+df.format(vState.getBattery0Voltage())
-			// +" V");
-			this.battery1Voltage.setText("B: " + this.df.format(vState.getBattery1Voltage()) + " V");
-			this.mphLabel.setText("V: " + this.df.format(vState.getBikeSpeedMPH()) + " MPH");
-			this.batteryCurrent.setText("BC: " + this.df.format(vState.getBatteryCurrent()) + " A");
-
-		}
 	}
 
 	private void constructGui() {
@@ -214,9 +160,9 @@ public class ViewThread implements Runnable {
 		mainWindow.add("Log", logPanel);
 		mainWindow.add("Analysis", analysisPanel);
 		
-		initSensorPanel();
-		initLogPanel();
-		initAnalysisPanel();
+		sensorPanel.initPanel();
+		logPanel.initPanel();
+		analysisPanel.initPanel();
 		
 		mainWindow.setSelectedComponent(logPanel);
 		f.add(mainWindow);
@@ -226,123 +172,5 @@ public class ViewThread implements Runnable {
 		f.setVisible(true);
 	}
 
-	private void initAnalysisPanel(){
-		//add components here
-		for(File f : this.logFileDirectory.listFiles()){
-			if(f.getName().contains("CCLog")){
-				this.logSelectorBox.addItem(new LogFile(f));
-			}
-		}
-		
-		this.logSelectorBox.addActionListener(new ActionListener() {
-            
-			@Override
-            public void actionPerformed(ActionEvent e) {    
-                LogFile s = (LogFile) logSelectorBox.getSelectedItem();
-                analyzeAndDisplay(s);
-            }
-			
-		});
-		
-		this.analysisPanel.add(this.logSelectorBox);
-	}
-	
-	private void analyzeAndDisplay(LogFile f){
-		
-	}
-	private class LogFile{
-		private final File f;
-		private final String id;
-		
-		LogFile(File f){
-			this.f = f;
-			this.id = createName(f);
-		}
-		
-		private String createName(File f){
-			String fileName = f.getName();
-			String datetime = fileName.substring(fileName.indexOf('_')+1, fileName.indexOf('.'));
-			String date = datetime.substring(0, datetime.indexOf('_')).replace('-', '/');
-			String time = datetime.substring(datetime.indexOf('_')+2).replace('-', ':');
-			return date+" "+time;
-		}
-		
-		public String toString(){
-			return id;
-		}
-		
-		public File getFile(){
-			return this.f;
-		}
-	}
-	
-	private void initLogPanel(){
-		this.logPanel.add(this.logText);
-		this.logText.setFont(this.logText.getFont().deriveFont(18f));
-		this.logText.setBorder(BorderFactory.createTitledBorder("Event Log"));
-	}
-	
-	private void initSensorPanel() {
-		this.sensorPanel.setLayout(new FlowLayout());
-		
-		this.initLabelIndicator(this.keyLabel);
-		this.initLabelIndicator(this.prechargeLabel);
-		this.initLabelIndicator(this.chargingLabel);
-		this.initLabelIndicator(this.dischargeLabel);
-		this.initLabelIndicator(this.voltageLabel);
-		this.initLabelIndicator(this.batteryLabel);
-		this.initLabelIndicator(this.capacitorLabel);
-		this.initLabelIndicator(this.gpsLockLabel);
-
-		JPanel indicatorsPanel = new JPanel();
-		indicatorsPanel.setLayout(new FlowLayout());
-		indicatorsPanel.add(this.keyLabel);
-		indicatorsPanel.add(this.chargingLabel);
-		indicatorsPanel.add(this.dischargeLabel);
-		indicatorsPanel.add(this.prechargeLabel);
-		indicatorsPanel.setBorder(BorderFactory.createTitledBorder("Indicators"));
-
-		JPanel warningsPanel = new JPanel();
-		warningsPanel.setLayout(new FlowLayout());
-		warningsPanel.add(this.gpsLockLabel);
-		warningsPanel.add(this.voltageLabel);
-		warningsPanel.setBorder(BorderFactory.createTitledBorder("Warnings"));
-
-		JPanel sourcePanel = new JPanel();
-		// sourcePanel.setLayout(new BoxLayout(sourcePanel, BoxLayout.Y_AXIS));
-		sourcePanel.setLayout(new FlowLayout());
-		sourcePanel.setBorder(BorderFactory.createTitledBorder("Source"));
-		sourcePanel.add(this.batteryLabel);
-		sourcePanel.add(this.capacitorLabel);
-
-		JPanel gaugesPanel = new JPanel();
-		this.initLabelGauge(this.batteryCurrent);
-		this.initLabelGauge(this.mphLabel);
-		// initLabelGauge(battery0Voltage);
-		this.initLabelGauge(this.battery1Voltage);
-		gaugesPanel.setLayout(new BoxLayout(gaugesPanel, BoxLayout.Y_AXIS));
-		gaugesPanel.setBorder(BorderFactory.createTitledBorder("Gauges"));
-		gaugesPanel.add(this.batteryCurrent);
-		gaugesPanel.add(this.mphLabel);
-		// gaugesPanel.add(battery0Voltage);
-		gaugesPanel.add(this.battery1Voltage);
-		
-		sensorPanel.add(indicatorsPanel);
-		sensorPanel.add(warningsPanel);
-		sensorPanel.add(sourcePanel);
-		sensorPanel.add(gaugesPanel);
-	}
-
-	private void initLabelIndicator(JLabel label) {
-		label.setOpaque(true);
-		label.setPreferredSize(new Dimension(95, 70));
-		label.setBorder(BorderFactory.createBevelBorder(1));
-		label.setHorizontalAlignment(SwingConstants.CENTER);
-		label.setFont(label.getFont().deriveFont(18f));
-	}
-
-	private void initLabelGauge(JLabel label) {
-		label.setFont(label.getFont().deriveFont(18f));
-	}
 
 }
