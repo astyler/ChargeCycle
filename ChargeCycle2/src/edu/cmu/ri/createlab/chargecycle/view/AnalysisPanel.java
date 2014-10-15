@@ -32,7 +32,7 @@ public class AnalysisPanel extends JPanel{
 	private static final long serialVersionUID = 1L;
 	
 	private final File logFileDirectory;
-	private final JComboBox<LogFile> logSelectorBox = new JComboBox<LogFile>();
+	private final JComboBox logSelectorBox = new JComboBox();
 	private final JLabel efficiencyLabel = new JLabel("Efficiency: 0.000 miles / AmpHour");
 	private final JLabel ampHourLabel = new JLabel("AH Spent: 00.000 AmpHours");
 	private final JLabel distanceLabel = new JLabel("Distance Traveled: 00.000 Miles");
