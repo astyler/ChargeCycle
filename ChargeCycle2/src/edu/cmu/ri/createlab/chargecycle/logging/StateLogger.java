@@ -11,7 +11,7 @@ import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 public class StateLogger {
 	private final File logFileDirectory;
 	private FileWriter fw;
-	private final SimpleDateFormat logDateFormat = new SimpleDateFormat("yyyy.MM.dd, HH:mm:ss, SSS");
+	
 	private final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyy-MM-dd__HH-mm-ss");
 
 	public StateLogger(File logFileDirectory) {
@@ -27,7 +27,8 @@ public class StateLogger {
 	}
 
 	public synchronized void writeState(VehicleState vState) throws IOException {
-		this.fw.write(this.logDateFormat.format(Calendar.getInstance().getTime()) + ", ");
+		//no longer needed, time is stored in vehicle state
+		//this.fw.write(this.logDateFormat.format(Calendar.getInstance().getTime()) + ", ");
 		this.fw.write(vState.toString());
 		// fw.write(System.lineSeparator());
 		this.fw.write(System.getProperty("line.separator"));
@@ -35,7 +36,8 @@ public class StateLogger {
 	}
 
 	public synchronized void writeString(String msg) throws IOException {
-		this.fw.write(this.logDateFormat.format(Calendar.getInstance().getTime()) + ", ");
+		//no msg writing at the time, can infer time between lines
+		//this.fw.write(this.logDateFormat.format(Calendar.getInstance().getTime()) + ", ");
 		this.fw.write(msg);
 		// fw.write(System.lineSeparator());
 		this.fw.write(System.getProperty("line.separator"));

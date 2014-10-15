@@ -1,5 +1,8 @@
 package edu.cmu.ri.createlab.chargecycle.model;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * @author astyler Note: VehicleState is immutable. This allows us to pass the
  *         reference around to many threads that will simultaneously read it
@@ -62,8 +65,10 @@ public class VehicleState {
 	private final int bikeSpeedEncoderTicksAbsolute;// 32bit
 	private final double bikeSpeedFPS;// feet per second
 	private final double bikeSpeedMPH;// miles per hour
-
-	public VehicleState(String protocolVersion, String firmwareVersion, String hardwareVersion, boolean dischargeEnable, boolean prechargeEnable,
+	private final Calendar time;
+	private final SimpleDateFormat logDateFormat = new SimpleDateFormat("yyyy.MM.dd, HH:mm:ss, SSS");
+	
+	public VehicleState(Calendar time, String protocolVersion, String firmwareVersion, String hardwareVersion, boolean dischargeEnable, boolean prechargeEnable,
 			boolean sourceSelector, boolean batteryCharging, boolean key, boolean capOverVoltage, double requestedCapChargingCurrentAmps,
 			double capChargingCurrentAmps, double altitude, double ambientTemp, double accelerometerX, double accelerometerY, double accelerometerZ,
 			double compassX, double compassY, double compassZ, double gyroX, double gyroY, double gyroZ, int throttlePot, int throttleScale, int throttleMax,
@@ -73,6 +78,7 @@ public class VehicleState {
 			double battery0Temperature, double capacitor1Temperature, double capacitor0Temperature, int bikeSpeedEncoderTicksAbsolute, double bikeSpeedFPS,
 			double bikeSpeedMPH) {
 		super();
+		this.time = time;
 		this.protocolVersion = protocolVersion;
 		this.firmwareVersion = firmwareVersion;
 		this.hardwareVersion = hardwareVersion;
@@ -122,6 +128,10 @@ public class VehicleState {
 		this.bikeSpeedEncoderTicksAbsolute = bikeSpeedEncoderTicksAbsolute;
 		this.bikeSpeedFPS = bikeSpeedFPS;
 		this.bikeSpeedMPH = bikeSpeedMPH;
+	}
+	
+	public Calendar getTime(){
+		return this.time;
 	}
 
 	public String getProtocolVersion() {
@@ -322,7 +332,7 @@ public class VehicleState {
 
 	@Override
 	public String toString() {
-		return this.protocolVersion + "," + this.firmwareVersion + "," + this.hardwareVersion + "," + this.boolToString(this.dischargeEnable) + ","
+		return this.logDateFormat.format(this.time)+","+this.protocolVersion + "," + this.firmwareVersion + "," + this.hardwareVersion + "," + this.boolToString(this.dischargeEnable) + ","
 				+ this.boolToString(this.prechargeEnable) + "," + this.boolToString(this.sourceSelector) + "," + this.boolToString(this.batteryCharging) + ","
 				+ this.boolToString(this.key) + "," + this.boolToString(this.capOverVoltage) + "," + this.requestedCapChargingCurrentAmps + ","
 				+ this.capChargingCurrentAmps + "," + this.altitude + "," + this.ambientTemp + "," + this.accelerometerX + "," + this.accelerometerY + ","

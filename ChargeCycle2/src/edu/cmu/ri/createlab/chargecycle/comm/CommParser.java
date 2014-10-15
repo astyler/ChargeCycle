@@ -1,9 +1,11 @@
 package edu.cmu.ri.createlab.chargecycle.comm;
 
+import java.util.Calendar;
+
 import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 
 public class CommParser {
-	public static VehicleState Parse(String comm) throws ParseException {
+	public static VehicleState Parse(Calendar time, String comm) throws ParseException {
 		// Electric Bike MCU Data Protocol V1
 		String[] parts = comm.split(",");
 		if (parts.length != 50) {
@@ -16,7 +18,9 @@ public class CommParser {
 			throw new ParseException("Incompatable protocol version; expecting V1, received " + parts[1] + " in input string: " + comm);
 		}
 
-		return new VehicleState(parts[1], // String protocolVersion
+		return new VehicleState(
+				time,
+				parts[1], // String protocolVersion
 				parts[2], // String firmwareVersion
 				parts[3], // String hardwareVersion
 				Integer.parseInt(parts[4]) == 1,// boolean dischargeEnable

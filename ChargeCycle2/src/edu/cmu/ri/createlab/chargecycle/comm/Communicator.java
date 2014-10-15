@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.TooManyListenersException;
@@ -241,7 +242,7 @@ public class Communicator implements SerialPortEventListener {
 			this.inputBuffer = this.inputBuffer.substring(sentenceEndIndex);
 
 			try {
-				this.state.setVehicleState(CommParser.Parse(inputSentence));
+				this.state.setVehicleState(CommParser.Parse(Calendar.getInstance(), inputSentence));
 				// logger.logEvent("S: "+inputSentence);
 			} catch (ParseException e) {
 				this.logger.logEvent("Parsing of sentence failed");

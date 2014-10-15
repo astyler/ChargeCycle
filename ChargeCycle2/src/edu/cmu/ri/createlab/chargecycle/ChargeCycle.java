@@ -38,19 +38,19 @@ public class ChargeCycle {
 			e1.printStackTrace();
 		}
 		int loopValue = 0;
-
+		
 		while (state.isAlive()) {
 			try {
 				loopValue++;
 				VehicleState currState = state.getVehicleState();
 
+
 				// if(currState != prevState && currState != null){
-				if (currState != null) {
+				if (currState != null) {					
 					// set state logging frequency based on state:
 					// if charging, every 50 loops, or about 5 seconds
 					// if not, every 5 loops, or about half a second
 					int recordingFrequency = currState.isBatteryCharging() ? 50 : 5;
-
 					if (loopValue % recordingFrequency == 0) {
 						stateLogger.writeState(currState);
 					}
@@ -58,7 +58,6 @@ public class ChargeCycle {
 				// eventLogger.flushLog();
 				// do main thread stuff
 				Thread.sleep(100);
-				// prevState = currState;
 				if (loopValue == 100 && (currState == null || comms.getConnected() == false) && commThread.isDone()) {
 					eventLogger.logEvent("Retrying bike connect...");
 					commThread = new CommunicationsThread(state, comms, eventLogger);

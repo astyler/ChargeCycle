@@ -30,9 +30,13 @@ public class SensorPanel extends JPanel {
 	private final JLabel capacitorLabel = new JLabel("Capacitor");
 	private final JLabel batteryLabel = new JLabel("Battery");
 	// private final JLabel battery0Voltage = new JLabel("B1: 0.00 V");
-	private final JLabel battery1Voltage = new JLabel("B: 00.00 V");
-	private final JLabel mphLabel = new JLabel("V: 00.00 MPH");
-	private final JLabel batteryCurrent = new JLabel("BC: 000.00 A");
+	private final JLabel battery1Voltage = new JLabel("Battery Voltage: 00.00 V");
+	private final JLabel mphLabel = new JLabel("Bike Speed: 00.00 MPH");
+	private final JLabel batteryCurrent = new JLabel("Battery Current: 000.00 A");
+	private final JLabel efficiencyLabel = new JLabel("Efficiency: 0.000 miles / AmpHour");
+	private final JLabel ampHourLabel = new JLabel("AH Spent: 00.000 AmpHours");
+	private final JLabel distanceLabel = new JLabel("Distance Traveled: 00.000 Miles");
+	private final JLabel timeLabel = new JLabel("Time Elapsed: 00000 seconds");
 	
 	private final Color trueWarningColor = Color.RED;
 	private final Color falseWarningColor = new Color(80, 0, 0);
@@ -87,14 +91,28 @@ public class SensorPanel extends JPanel {
 		gaugesPanel.add(this.batteryCurrent);
 		gaugesPanel.add(this.mphLabel);
 		// gaugesPanel.add(battery0Voltage);
-		gaugesPanel.add(this.battery1Voltage);
+		gaugesPanel.add(this.battery1Voltage);		
 		
+		JPanel sumsPanel = new JPanel();
+		this.initLabelGauge(this.ampHourLabel);
+		this.initLabelGauge(this.distanceLabel);
+		this.initLabelGauge(this.efficiencyLabel);
+		this.initLabelGauge(this.timeLabel);
+		sumsPanel.setLayout(new BoxLayout(sumsPanel, BoxLayout.Y_AXIS));
+		sumsPanel.setBorder(BorderFactory.createTitledBorder("Trip Stats"));
+		
+		sumsPanel.add(this.ampHourLabel);
+		sumsPanel.add(this.distanceLabel);
+		sumsPanel.add(this.efficiencyLabel);
+		sumsPanel.add(this.timeLabel);
+
 		this.add(indicatorsPanel);
 		this.add(warningsPanel);
 		this.add(sourcePanel);
 		this.add(gaugesPanel);
+		this.add(sumsPanel);
 	}
-	
+
 	public void updatePanel(State state){
 		VehicleState vState = state.getVehicleState();
 		if (vState != null) {
@@ -109,10 +127,15 @@ public class SensorPanel extends JPanel {
 
 			// battery0Voltage.setText("B1: "+df.format(vState.getBattery0Voltage())
 			// +" V");
-			this.battery1Voltage.setText("B: " + this.df.format(vState.getBattery1Voltage()) + " V");
-			this.mphLabel.setText("V: " + this.df.format(vState.getBikeSpeedMPH()) + " MPH");
-			this.batteryCurrent.setText("BC: " + this.df.format(vState.getBatteryCurrent()) + " A");
+			this.battery1Voltage.setText("Battery Voltage: " + this.df.format(vState.getBattery1Voltage()) + " V");
+			this.mphLabel.setText("Bike Speed: " + this.df.format(vState.getBikeSpeedMPH()) + " MPH");
+			this.batteryCurrent.setText("Battery Current: " + this.df.format(vState.getBatteryCurrent()) + " A");
+			this.efficiencyLabel.setText("Efficiency: " + df.format(state.getEfficiency()) +  " miles / amphour");
+			this.ampHourLabel.setText("AH Spent: "+df.format(state.getAmpHoursSpent()) +" amp hours");
+			this.distanceLabel.setText("Distance Traveled: "+df.format(state.getDistanceTraveled())+ " miles");
+			this.timeLabel.setText("Time Elapsed "+(int)state.getSecondsElapsed() + " seconds");
 		}
+
 	}
 	
 	private void updateWarning(JLabel label, boolean value) {
