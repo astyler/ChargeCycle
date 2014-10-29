@@ -33,9 +33,9 @@ public class ChargeCycle {
 		// VehicleState prevState = state.getVehicleState();
 		try {
 			stateLogger.startLogging();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (IOException e) {			
+			eventLogger.logEvent("Problem creating state logger file: "+stateLogger.getLogName());
+			eventLogger.logException(e);
 		}
 		int loopValue = 0;
 		int logFlush = 0;

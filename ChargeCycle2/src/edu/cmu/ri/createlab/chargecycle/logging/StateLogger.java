@@ -11,7 +11,7 @@ import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 public class StateLogger {
 	private final File logFileDirectory;
 	private FileWriter fw;
-	
+	private String logName;
 	private final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyy-MM-dd__HH-mm-ss");
 
 	public StateLogger(File logFileDirectory) {
@@ -20,8 +20,8 @@ public class StateLogger {
 
 	public synchronized void startLogging() throws IOException {
 		this.logFileDirectory.mkdirs();
-		String logName = "CCLog_" + this.fileDateFormat.format(Calendar.getInstance().getTime()) + ".txt";
-		File log = new File(this.logFileDirectory, logName);
+		this.logName = "CCLog_" + this.fileDateFormat.format(Calendar.getInstance().getTime()) + ".txt";
+		File log = new File(this.logFileDirectory, this.logName);
 		log.createNewFile();
 		this.fw = new FileWriter(log, true);
 	}
@@ -51,6 +51,10 @@ public class StateLogger {
 	public synchronized void stopLogging() throws IOException {
 		this.fw.flush();
 		this.fw.close();
+	}
+	
+	public synchronized String getLogName(){
+		return this.logName;
 	}
 
 }
