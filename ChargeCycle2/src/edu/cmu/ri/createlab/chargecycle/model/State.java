@@ -25,8 +25,10 @@ public class State {
 	private volatile double distanceTraveled;
 	private volatile double efficiency;
 	
+	
 	final static double ENCODER_TICKS_TO_MILES = 36490.6666667;
 	
+	private volatile int deadMan;
 
 	public State() {
 		this.vehicle = null;// new VehicleState(0,0,0,0,0,0,0,0,0,0,0);
@@ -36,6 +38,7 @@ public class State {
 		this.secondsElapsed = 0.0;
 		this.distanceTraveled = 0.0;
 		this.efficiency = 0.0;
+		this.deadMan = 0;
 	}
 
 	public VehicleState getVehicleState() {
@@ -86,11 +89,16 @@ public class State {
 		// updating references is atomic and need not be synchronized with reads
 		// but we dont want this method running two times at once
 		this.vehicle = newState;
-		if (newState.isKey() == false && newState.isBatteryCharging() == false) {
-			this.setAlive(false);
-		}
 		
-
+		if (newState.isKey() == false && newState.isBatteryCharging() == false) {
+			this.deadMan ++;
+			if(this.deadMan > 5){
+				this.setAlive(false);
+			}
+		}
+		else{
+			this.deadMan = 0;
+		}
 	}
 
 	public boolean isAlive() {

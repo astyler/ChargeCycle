@@ -15,7 +15,7 @@ import edu.cmu.ri.createlab.chargecycle.model.VehicleState;
 import edu.cmu.ri.createlab.chargecycle.view.ViewThread;
 
 public class ChargeCycle {
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		File logFileDirectory = new File(args[0]);
 
 		State state = new State();
@@ -38,7 +38,7 @@ public class ChargeCycle {
 			e1.printStackTrace();
 		}
 		int loopValue = 0;
-		
+		int logFlush = 0;
 		while (state.isAlive()) {
 			try {
 				loopValue++;
@@ -53,6 +53,12 @@ public class ChargeCycle {
 					int recordingFrequency = currState.isBatteryCharging() ? 50 : 5;
 					if (loopValue % recordingFrequency == 0) {
 						stateLogger.writeState(currState);
+						logFlush++;
+						if(logFlush % 100 == 0){
+							stateLogger.flushLog();
+							logFlush = 0;
+						}
+						
 					}
 				}
 				// eventLogger.flushLog();
@@ -91,7 +97,11 @@ public class ChargeCycle {
 
 		VehicleState vState = state.getVehicleState();
 		if (vState != null && vState.isKey() == false && vState.isBatteryCharging() == false) {
-			Runtime.getRuntime().exec("pmset sleepnow");
+			try {
+				Runtime.getRuntime().exec("pmset sleepnow");
+			} catch (IOException e) {				
+				e.printStackTrace();
+			}
 		}
 		System.exit(0);
 	}

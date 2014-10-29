@@ -34,6 +34,10 @@ public class StateLogger {
 		this.fw.write(System.getProperty("line.separator"));
 
 	}
+	
+	public synchronized void flushLog() throws IOException{
+		this.fw.flush();
+	}
 
 	public synchronized void writeString(String msg) throws IOException {
 		//no msg writing at the time, can infer time between lines
