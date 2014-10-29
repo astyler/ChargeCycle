@@ -39,6 +39,7 @@ public class ChargeCycle {
 		}
 		int loopValue = 0;
 		int logFlush = 0;
+		
 		while (state.isAlive()) {
 			try {
 				loopValue++;
@@ -54,7 +55,7 @@ public class ChargeCycle {
 					if (loopValue % recordingFrequency == 0) {
 						stateLogger.writeState(currState);
 						logFlush++;
-						if(logFlush % 100 == 0){
+						if(logFlush % 10 == 0){
 							stateLogger.flushLog();
 							logFlush = 0;
 						}
