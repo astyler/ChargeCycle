@@ -34,8 +34,10 @@ public class ChargeCycle {
 		try {
 			stateLogger.startLogging();
 		} catch (IOException e) {			
-			eventLogger.logEvent("Problem creating state logger file: "+stateLogger.getLogName());
+			String msg = "Problem creating state logger file: "+stateLogger.getLogName();
+			eventLogger.logEvent(msg);
 			eventLogger.logException(e);
+			System.err.println(msg);
 		}
 		int loopValue = 0;
 		int logFlush = 0;
@@ -45,13 +47,22 @@ public class ChargeCycle {
 				loopValue++;
 				VehicleState currState = state.getVehicleState();
 
-
+				if (loopValue % 5 == 0) {
+					if(currState != null){
+						if(!currState.isBatteryCharging() || loopValue % 100 == 0){
+							//if not charging, record state. or if we are charging, record less frequently
+							stateLogger.writeState(currState);
+						}
+					} else stateLogger.writeString("Null state");
+					
+				}
 				// if(currState != prevState && currState != null){
+				/*
 				if (currState != null) {					
 					// set state logging frequency based on state:
-					// if charging, every 50 loops, or about 5 seconds
+					// if charging, every 100 loops, or about 10 seconds
 					// if not, every 5 loops, or about half a second
-					int recordingFrequency = currState.isBatteryCharging() ? 50 : 5;
+					int recordingFrequency = currState.isBatteryCharging() ? 100 : 5;
 					if (loopValue % recordingFrequency == 0) {
 						stateLogger.writeState(currState);
 						logFlush++;
@@ -62,6 +73,7 @@ public class ChargeCycle {
 						
 					}
 				}
+				*/
 				// eventLogger.flushLog();
 				// do main thread stuff
 				Thread.sleep(100);

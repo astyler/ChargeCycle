@@ -32,14 +32,14 @@ public class AnalysisPanel extends JPanel{
 	private static final long serialVersionUID = 1L;
 	
 	private final File logFileDirectory;
-	private final JComboBox logSelectorBox = new JComboBox();
+	private final JComboBox<LogFile> logSelectorBox = new JComboBox<LogFile>();
 	private final JLabel efficiencyLabel = new JLabel("Efficiency: 0.000 miles / AmpHour");
 	private final JLabel ampHourLabel = new JLabel("AH Spent: 00.000 AmpHours");
 	private final JLabel distanceLabel = new JLabel("Distance Traveled: 00.000 Miles");
 	private final JLabel timeLabel = new JLabel("Time Elapsed: 00000 seconds");
 	private final DecimalFormat df = new DecimalFormat("0.000");
 	
-	private final double ENCODER_TICKS_TO_MILES = 36490.6666667;
+	//private final double ENCODER_TICKS_TO_MILES = 36490.6666667;
 	
 	public AnalysisPanel(File logFileDirectory){
 		this.logFileDirectory = logFileDirectory;
@@ -102,7 +102,8 @@ public class AnalysisPanel extends JPanel{
 					VehicleState current = parseLogLine(line);					
 					fakeState.setVehicleState(current);					
 				} catch (ParseException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
+					//ignore null state parse exceptions... for now.
 				}
 			}
 			br.close();
@@ -123,6 +124,7 @@ public class AnalysisPanel extends JPanel{
 
 
 	private VehicleState parseLogLine(String line) throws ParseException {
+		if(line.contains("Null")) throw new ParseException("Null state");
 		//yyyy.MM.dd, HH:mm:ss, SSS, REST
 		String[] parts = line.split(", ",4);
 		String vstate = "!!!,"+parts[3];

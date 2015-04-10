@@ -20,11 +20,11 @@ public class CommunicationsThread extends SwingWorker<Boolean, Void> {
 		this.state = state;
 	}
 
-	public String getExampleSerialMessage() {
+/*	public String getExampleSerialMessage() {
 		String exampleMsg = "!!!,V1,V1,V1,0,0,0,0,1,0,0,0,1000,20,10,10,10,20,20,20,0,0,0,4095,255,65535,65535,4095,255,65535,65535,40,N,100,E,0,0,0,0,12,12,12,12,30,30,30,30,1000,7,10,\r\n";
 		return exampleMsg;
 	}
-
+*/
 	@Override
 	protected Boolean doInBackground() throws Exception {
 		// Connect to Serial Port
